@@ -58,7 +58,10 @@ def seed_database():
             db.query(Stock).delete()
             db.query(Medicine).delete()
             db.query(PHC).delete()
-            db.execute(text("DELETE FROM sqlite_sequence WHERE name IN ('phcs', 'medicines', 'stocks', 'footfalls', 'bed_occupancies', 'doctor_attendances', 'test_availabilities')"))
+            try:
+                db.execute(text("DELETE FROM sqlite_sequence WHERE name IN ('phcs', 'medicines', 'stocks', 'footfalls', 'bed_occupancies', 'doctor_attendances', 'test_availabilities')"))
+            except Exception:
+                pass  # sqlite_sequence doesn't exist on a fresh database
         db.commit()
         
         # Seed PHCs
