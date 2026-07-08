@@ -1856,7 +1856,7 @@ async def get_dashboard_summary(db: Session = Depends(get_db)):
     anomalies = ml_manager.anomaly_detector.detect_anomalies(phc_scores)
     
     critical_alerts = sum(1 for a in anomalies if a.get('severity') == 'critical')
-    warning_alerts = sum(1 for a in anomalies if a.get('severity') in ['high', 'medium'])
+    warning_alerts = sum(1 for a in anomalies if a.get('severity') != 'critical')
     
     # Build alert count and severity map per PHC
     alert_count_map = {}
