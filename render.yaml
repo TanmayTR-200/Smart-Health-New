@@ -1,14 +1,6 @@
 # Render Blueprint for Smart Health
-# Docs: https://render.com/docs/blueprint-spec
-# After pushing this file to GitHub, go to:
-#   Dashboard → New → Blueprint → select your repo
-# Render will create the database + web service automatically.
-
-databases:
-  - name: smart-health-new-db
-    databaseName: smart_health_new
-    plan: free
-    ipAllowList: []
+# Uses SQLite (no separate database service needed)
+# Go to: Dashboard → New → Blueprint → select your repo
 
 services:
   - type: web
@@ -22,10 +14,6 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
-      - key: DATABASE_URL
-        fromDatabase:
-          name: smart-health-new-db
-          property: connectionString
       - key: GEMINI_API_KEY
         sync: false
       - key: API_ENV
