@@ -60,7 +60,7 @@ def main():
             return False
     except:
         print("❌ Backend not running. Start it with:")
-        print("   cd d:\\Hack2Skill\\smart-health\\backend")
+        print("   cd d:\\Hack2Skill\\smart-health-new\\backend")
         print("   uvicorn main:app --reload")
         return False
     

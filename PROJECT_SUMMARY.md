@@ -264,7 +264,7 @@ A full-stack AI-powered district health management system for monitoring and opt
 ## File Structure
 
 ```
-smart-health/
+smart-health-new/
 ├── backend/
 │   ├── app/
 │   │   ├── database/

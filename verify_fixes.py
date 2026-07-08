@@ -34,11 +34,11 @@ def verify_fixes():
         
         # Check 2: No stray database files
         print("\n2. Checking for stray database files...")
-        smart_health_dir = os.path.dirname(os.path.abspath(__file__))
+        smart_health_new_dir = os.path.dirname(os.path.abspath(__file__))
         stray_dbs = []
-        for root, dirs, files in os.walk(smart_health_dir):
+        for root, dirs, files in os.walk(smart_health_new_dir):
             for file in files:
-                if file == 'smart_health.db' and root != smart_health_dir:
+                if file == 'smart_health_new.db' and root != smart_health_new_dir:
                     stray_dbs.append(os.path.join(root, file))
         
         if stray_dbs:

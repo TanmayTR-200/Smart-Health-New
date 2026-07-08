@@ -211,8 +211,8 @@ npm run dev
 ### Option 3: Docker
 
 ```bash
-docker build -t smart-health .
-docker run -p 8000:8000 -e GEMINI_API_KEY=your_key smart-health
+docker build -t smart-health-new .
+docker run -p 8000:8000 -e GEMINI_API_KEY=your_key smart-health-new
 ```
 
 ### Environment Variables
@@ -221,7 +221,7 @@ Copy `backend/.env.example` to `backend/.env` and configure:
 
 ```env
 GEMINI_API_KEY=your_google_gemini_api_key    # Optional — system works without it (uses fallbacks)
-DATABASE_URL=sqlite:///smart_health.db       # Or postgresql://user:pass@host:5432/dbname
+DATABASE_URL=sqlite:///smart_health_new.db       # Or postgresql://user:pass@host:5432/dbname
 ```
 
 ---
@@ -342,8 +342,8 @@ npm run build      # Outputs to dist/
 
 ### Backend (Docker)
 ```bash
-docker build -t smart-health .
-docker run -p 8000:8000 -e GEMINI_API_KEY=$KEY smart-health
+docker build -t smart-health-new .
+docker run -p 8000:8000 -e GEMINI_API_KEY=$KEY smart-health-new
 ```
 
 ### Production Path

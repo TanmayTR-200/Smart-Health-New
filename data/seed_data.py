@@ -45,15 +45,20 @@ def seed_database():
     db = SessionLocal()
     
     try:
-        # Clear existing data
+        # Clear existing data and reset auto-increment sequences
         print("Clearing existing data...")
-        db.query(TestAvailability).delete()
-        db.query(DoctorAttendance).delete()
-        db.query(BedOccupancy).delete()
-        db.query(Footfall).delete()
-        db.query(Stock).delete()
-        db.query(Medicine).delete()
-        db.query(PHC).delete()
+        from sqlalchemy import text
+        if engine.dialect.name == 'postgresql':
+            db.execute(text("TRUNCATE TABLE test_availabilities, doctor_attendances, bed_occupancies, footfalls, stocks, medicines, phcs RESTART IDENTITY CASCADE"))
+        else:
+            db.query(TestAvailability).delete()
+            db.query(DoctorAttendance).delete()
+            db.query(BedOccupancy).delete()
+            db.query(Footfall).delete()
+            db.query(Stock).delete()
+            db.query(Medicine).delete()
+            db.query(PHC).delete()
+            db.execute(text("DELETE FROM sqlite_sequence WHERE name IN ('phcs', 'medicines', 'stocks', 'footfalls', 'bed_occupancies', 'doctor_attendances', 'test_availabilities')"))
         db.commit()
         
         # Seed PHCs

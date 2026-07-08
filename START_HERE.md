@@ -2,9 +2,9 @@
 
 ## ⚠️ IMPORTANT: Database Location Issue
 
-The database file `smart_health.db` is created at:
+The database file `smart_health_new.db` is created at:
 ```
-d:\Hack2Skill\smart-health\smart_health.db
+d:\Hack2Skill\smart-health-new\smart_health_new.db
 ```
 
 **NOT** in the backend folder!
@@ -20,7 +20,7 @@ scripts\quick_start.bat
 
 **OR** run in PowerShell:
 ```powershell
-cd d:\Hack2Skill\smart-health
+cd d:\Hack2Skill\smart-health-new
 .\scripts\quick_start.bat
 ```
 
@@ -38,13 +38,13 @@ This will:
 
 ### Step 1: Delete Old Database (If Exists)
 ```powershell
-cd d:\Hack2Skill\smart-health
-del smart_health.db
+cd d:\Hack2Skill\smart-health-new
+del smart_health_new.db
 ```
 
 ### Step 2: Setup Database
 ```powershell
-cd d:\Hack2Skill\smart-health
+cd d:\Hack2Skill\smart-health-new
 python setup_database.py
 ```
 
@@ -58,7 +58,7 @@ You should see:
 
 ### Step 3: Start Backend (Terminal 1)
 ```powershell
-cd d:\Hack2Skill\smart-health\backend
+cd d:\Hack2Skill\smart-health-new\backend
 python -m uvicorn main:app --reload
 ```
 
@@ -69,7 +69,7 @@ python -m uvicorn main:app --reload
 
 ### Step 4: Start Frontend (Terminal 2)
 ```powershell
-cd d:\Hack2Skill\smart-health\frontend
+cd d:\Hack2Skill\smart-health-new\frontend
 npm run dev
 ```
 
@@ -84,7 +84,7 @@ http://localhost:5173
 
 ### Test 1: Check Database Exists
 ```powershell
-cd d:\Hack2Skill\smart-health
+cd d:\Hack2Skill\smart-health-new
 python test_setup.py
 ```
 
@@ -117,10 +117,10 @@ The "Select PHC" dropdown should now show 6 PHCs (not empty!).
 **Solution:**
 ```powershell
 # 1. Make sure you're in the right directory
-cd d:\Hack2Skill\smart-health
+cd d:\Hack2Skill\smart-health-new
 
 # 2. Delete database if it exists
-del smart_health.db
+del smart_health_new.db
 
 # 3. Run setup
 python setup_database.py
@@ -143,8 +143,8 @@ python -m uvicorn main:app --reload
 # Stop all servers (Ctrl+C in both terminals)
 
 # Delete database
-cd d:\Hack2Skill\smart-health
-del smart_health.db
+cd d:\Hack2Skill\smart-health-new
+del smart_health_new.db
 
 # Run setup
 python setup_database.py
@@ -227,7 +227,7 @@ npm run dev
 
 If nothing works, run this:
 ```powershell
-cd d:\Hack2Skill\smart-health
+cd d:\Hack2Skill\smart-health-new
 python test_setup.py
 ```
 
@@ -237,7 +237,7 @@ This will tell you exactly what's wrong and how to fix it.
 
 ## 📞 Remember
 
-- **Database location**: `d:\Hack2Skill\smart-health\smart_health.db`
+- **Database location**: `d:\Hack2Skill\smart-health-new\smart_health_new.db`
 - **Backend auto-seeds**: If database is empty, backend creates it automatically
 - **Restart after seeding**: Always restart backend after creating database
 - **Use the script**: `scripts\quick_start.bat` handles everything

@@ -123,30 +123,30 @@
 ## Files Modified
 
 ### Backend
-1. **smart-health/backend/main.py**
+1. **smart-health-new/backend/main.py**
    - Fixed `trigger-event` endpoint to generate future data
    - Fixed bed occupancy calculation in advance-day and trigger-event
    - Added `GET /api/simulation/status` endpoint
    - Fixed division by zero in attendance rate calculation
 
 ### Frontend
-2. **smart-health/frontend/src/pages/Simulation.jsx**
+2. **smart-health-new/frontend/src/pages/Simulation.jsx**
    - Added `loadSimulationStatus()` function
    - Added `simulationStatus` state
    - Updated `useEffect` to load status on mount
    - Refresh status after advance-day and trigger-event actions
    - Display simulation status message in UI
 
-3. **smart-health/frontend/src/services/api.js**
+3. **smart-health-new/frontend/src/services/api.js**
    - Added `getSimulationStatus` API function
 
 ### Data
-4. **smart-health/fix_bed_occupancy.py** (new file)
+4. **smart-health-new/fix_bed_occupancy.py** (new file)
    - Script to fix existing bed occupancy data in database
    - Fixed 2194 records
 
 ### Tests
-5. **smart-health/test_e2e.py** (new file)
+5. **smart-health-new/test_e2e.py** (new file)
    - Comprehensive end-to-end test of all 4 fixes
    - All tests passing
 
@@ -157,11 +157,11 @@
 ### 1. Start the Application
 ```bash
 # Terminal 1: Start backend
-cd smart-health
+cd smart-health-new
 python -m uvicorn backend.main:app --reload
 
 # Terminal 2: Start frontend
-cd smart-health/frontend
+cd smart-health-new/frontend
 npm run dev
 ```
 

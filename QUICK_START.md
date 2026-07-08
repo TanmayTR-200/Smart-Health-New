@@ -97,7 +97,7 @@ The application will be available at `http://localhost:5173`
 
 ## Project Structure
 ```
-smart-health/
+smart-health-new/
 ├── backend/
 │   ├── app/
 │   │   ├── database/          # Database schema and connection

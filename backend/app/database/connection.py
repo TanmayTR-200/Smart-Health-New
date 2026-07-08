@@ -10,12 +10,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database URL - defaults to SQLite for easy demo
-# Use absolute path to smart-health directory for database
+# Use absolute path to smart-health-new directory for database
 import os
 current_file = os.path.abspath(__file__)  # backend/app/database/connection.py
 backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))  # backend dir
-parent_dir = os.path.dirname(backend_dir)  # smart-health dir
-db_path = os.path.join(parent_dir, "smart_health.db")
+parent_dir = os.path.dirname(backend_dir)  # smart-health-new dir
+db_path = os.path.join(parent_dir, "smart_health_new.db")
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
 
 # Create engine - with performance optimizations

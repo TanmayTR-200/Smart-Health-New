@@ -13,7 +13,7 @@ def setup_database():
     
     # Check if we're in the right directory
     if not os.path.exists('data/generator.py'):
-        print("❌ Error: Please run this script from the smart-health directory")
+        print("❌ Error: Please run this script from the smart-health-new directory")
         sys.exit(1)
     
     # Step 1: Generate data
@@ -34,31 +34,29 @@ def setup_database():
         print(f"❌ Error seeding database: {e}")
         sys.exit(1)
     
-    # Step 3: Verify database
+    # Step 3: Verify database (works with both SQLite and PostgreSQL)
     print("\n3. Verifying database...")
-    db_path = 'smart_health.db'
-    if os.path.exists(db_path):
-        import sqlite3
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
-        
-        # Count records in each table
-        tables = ['phcs', 'medicines', 'stock', 'footfall', 'bed_occupancy', 
-                  'doctor_attendance', 'test_availability']
-        
+    from sqlalchemy import create_engine, text
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    db_path = 'smart_health_new.db'
+    DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
+    engine = create_engine(DATABASE_URL)
+
+    tables = ['phcs', 'medicines', 'stocks', 'footfalls', 'bed_occupancies',
+              'doctor_attendances', 'test_availabilities']
+
+    with engine.connect() as conn:
         for table in tables:
             try:
-                cursor.execute(f"SELECT COUNT(*) FROM {table}")
-                count = cursor.fetchone()[0]
+                result = conn.execute(text(f"SELECT COUNT(*) FROM {table}"))
+                count = result.fetchone()[0]
                 print(f"  ✓ {table}: {count} records")
-            except:
+            except Exception:
                 print(f"  ⚠ {table}: table not found")
-        
-        conn.close()
-        print("\n✓ Database setup complete!")
-    else:
-        print(f"❌ Database not found at {db_path}")
-        sys.exit(1)
+
+    print("\n✓ Database setup complete!")
     
     print("\n" + "=" * 60)
     print("Next steps:")

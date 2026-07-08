@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: smart-health-new-db
+    environment:
+      POSTGRES_USER: smart_health_new
+      POSTGRES_PASSWORD: smart_health_new_pass
+      POSTGRES_DB: smart_health_new
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smart_health_new"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: smart-health-new-api
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://smart_health_new:smart_health_new_pass@db:5432/smart_health_new
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-your_api_key_here}
+      - PORT=8000
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

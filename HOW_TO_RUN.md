@@ -27,7 +27,7 @@ npm --version
 
 ### Option 1: Using the Setup Script (Easiest)
 ```bash
-# From the smart-health directory
+# From the smart-health-new directory
 python setup_database.py
 ```
 
@@ -64,7 +64,7 @@ chmod +x scripts/setup.sh
 
 ### Step 1: Clone or Navigate to Project
 ```bash
-cd smart-health
+cd smart-health-new
 ```
 
 ### Step 2: Backend Setup
@@ -213,12 +213,12 @@ pip install -r requirements.txt
 
 #### Issue: Database errors / Empty PHC dropdown
 ```bash
-# IMPORTANT: The database is created at: d:\Hack2Skill\smart-health\smart_health.db
+# IMPORTANT: The database is created at: d:\Hack2Skill\smart-health-new\smart_health_new.db
 # NOT in the backend folder!
 
-# Delete the database (from smart-health directory)
-del smart_health.db  # Windows
-rm smart_health.db   # Mac/Linux
+# Delete the database (from smart-health-new directory)
+del smart_health_new.db  # Windows
+rm smart_health_new.db   # Mac/Linux
 
 # Regenerate and reseed
 python data/generator.py
@@ -284,7 +284,7 @@ python data/seed_data.py
 ## Project Structure
 
 ```
-smart-health/
+smart-health-new/
 ├── backend/
 │   ├── main.py                 # FastAPI app entry point
 │   ├── requirements.txt        # Python dependencies
@@ -318,13 +318,13 @@ smart-health/
 
 ### 1. Start Backend (Terminal 1)
 ```bash
-cd smart-health/backend
+cd smart-health-new/backend
 uvicorn main:app --reload
 ```
 
 ### 2. Start Frontend (Terminal 2)
 ```bash
-cd smart-health/frontend
+cd smart-health-new/frontend
 npm run dev
 ```
 
@@ -395,9 +395,9 @@ serve -s dist -l 3000
 
 ### Backend (.env file in backend/)
 ```env
-DATABASE_URL=sqlite:///./smart_health.db
+DATABASE_URL=sqlite:///./smart_health_new.db
 # For PostgreSQL:
-# DATABASE_URL=postgresql://user:password@localhost/smart_health
+# DATABASE_URL=postgresql://user:password@localhost/smart_health_new
 ```
 
 ### Frontend (.env file in frontend/)
@@ -452,7 +452,7 @@ If all of the above work, you're ready for the demo! 🚀
 ## Important Notes
 
 ### Database Location
-The SQLite database is created at: **`smart-health/smart_health.db`**
+The SQLite database is created at: **`smart-health-new/smart_health_new.db`**
 
 This is in the project root, NOT in the backend folder. If you delete the database, make sure you're deleting from the correct location.
 
@@ -464,7 +464,7 @@ This is in the project root, NOT in the backend folder. If you delete the databa
 
 2. **"Error advancing simulation"**
    - Cause: Database is empty or backend can't find it
-   - Fix: Ensure database exists at `smart-health/smart_health.db` and restart backend
+   - Fix: Ensure database exists at `smart-health-new/smart_health_new.db` and restart backend
 
 3. **Backend can't find database after seeding**
    - Cause: Backend was started before database was created
@@ -473,7 +473,7 @@ This is in the project root, NOT in the backend folder. If you delete the databa
 ### Complete Setup Workflow
 ```bash
 # 1. Navigate to project root
-cd d:\Hack2Skill\smart-health
+cd d:\Hack2Skill\smart-health-new
 
 # 2. Setup database (first time only)
 python setup_database.py

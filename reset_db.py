@@ -7,10 +7,10 @@ import sqlite3
 import os
 import sys
 
-# Get absolute path to smart_health.db (same as connection.py)
+# Get absolute path to smart_health_new.db (same as connection.py)
 current_file = os.path.abspath(__file__)  # reset_db.py location
-smart_health_dir = os.path.dirname(current_file)  # smart-health directory
-db_path = os.path.join(smart_health_dir, "smart_health.db")
+smart_health_new_dir = os.path.dirname(current_file)  # smart-health-new directory
+db_path = os.path.join(smart_health_new_dir, "smart_health_new.db")
 
 print(f"Resetting database at: {db_path}")
 
