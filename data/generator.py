@@ -16,9 +16,11 @@ import json
 import random
 
 
-# Set random seed for reproducibility
-np.random.seed(42)
-random.seed(42)
+# Use time-based seed so each re-seed produces different data
+import time
+_seed = int(time.time())
+np.random.seed(_seed)
+random.seed(_seed)
 
 
 class PHCDataGenerator:
