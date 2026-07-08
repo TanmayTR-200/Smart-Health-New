@@ -17,6 +17,11 @@ backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(current_file)))  #
 parent_dir = os.path.dirname(backend_dir)  # smart-health-new dir
 db_path = os.path.join(parent_dir, "smart_health_new.db")
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
+# Render/Heroku use postgres:// but SQLAlchemy needs postgresql+psycopg2://
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+elif DATABASE_URL.startswith("postgresql://") and "+" not in DATABASE_URL.split("://")[0]:
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 # Create engine - with performance optimizations
 if DATABASE_URL.startswith("sqlite"):
