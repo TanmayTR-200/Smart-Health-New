@@ -9,7 +9,8 @@ psycopg2-binary==2.9.9
 alembic==1.12.1
 
 # ML/AI
-# prophet==1.1.5  # Optional - falls back to moving average if not installed
+prophet==1.1.5
+cmdstanpy>=1.0.4,<1.3  # Pinned: prophet 1.1.5 breaks with cmdstanpy 1.3+
 scikit-learn==1.3.2
 pandas==2.1.3
 numpy==1.26.2

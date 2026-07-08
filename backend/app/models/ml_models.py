@@ -21,8 +21,10 @@ from app.services.gemini_service import generate_text
 
 try:
     from prophet import Prophet
+    # Verify Prophet actually works (not just importable)
+    _test = Prophet()
     PROPHET_AVAILABLE = True
-except ImportError:
+except Exception:
     PROPHET_AVAILABLE = False
     print("Warning: Prophet not available. Using simple moving average for forecasting.")
 

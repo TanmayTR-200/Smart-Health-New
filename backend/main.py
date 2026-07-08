@@ -80,7 +80,7 @@ _dataframe_cache = DataCache(ttl_seconds=10)     # Short TTL for DataFrames
 
 def _get_cached_dataframes(db: Session) -> dict:
     """Get DataFrames with caching to avoid repeated full-table loads"""
-    cache_key = f"dataframes_{id(db)}"
+    cache_key = "dataframes_global"
     cached = _dataframe_cache.get(cache_key)
     if cached:
         return cached
@@ -100,7 +100,7 @@ def _get_cached_dataframes(db: Session) -> dict:
 
 def _get_phc_health_scores_cached(db: Session, phcs_list=None) -> list:
     """Get health scores with caching to avoid redundant calculations"""
-    cache_key = f"health_scores_{id(db)}"
+    cache_key = "health_scores_global"
     cached = _health_score_cache.get(cache_key)
     if cached:
         return cached
@@ -897,16 +897,27 @@ def _generate_day_for_phc(db, phc, target_date, generator, changes, medicines_ca
                 restock_delay = random.randint(3, 5)
                 restock_arrives_on = target_date + timedelta(days=restock_delay)
             
-            stock = Stock(
-                phc_id=phc.id,
-                medicine_id=medicine.id,
-                date=target_date,
-                quantity=new_stock,
-                min_required=medicine.min_stock_threshold,
-                last_restocked=last_restocked,
-                restock_arrives_on=restock_arrives_on
-            )
-            db.add(stock)
+            existing_stock = db.query(Stock).filter(
+                Stock.phc_id == phc.id,
+                Stock.medicine_id == medicine.id,
+                Stock.date == target_date
+            ).first()
+            if existing_stock:
+                existing_stock.quantity = new_stock
+                existing_stock.min_required = medicine.min_stock_threshold
+                existing_stock.last_restocked = last_restocked
+                existing_stock.restock_arrives_on = restock_arrives_on
+            else:
+                stock = Stock(
+                    phc_id=phc.id,
+                    medicine_id=medicine.id,
+                    date=target_date,
+                    quantity=new_stock,
+                    min_required=medicine.min_stock_threshold,
+                    last_restocked=last_restocked,
+                    restock_arrives_on=restock_arrives_on
+                )
+                db.add(stock)
     
     # Generate test availability (only from latest date for this PHC)
     latest_test_date = db.query(TestAvailability.date).filter(
@@ -922,17 +933,27 @@ def _generate_day_for_phc(db, phc, target_date, generator, changes, medicines_ca
     for test in tests:
         is_available = random.random() < 0.9
         equipment_status = "functional" if is_available else random.choice(["maintenance", "broken", "reagent_stockout"])
-        new_test = TestAvailability(
-            phc_id=phc.id,
-            test_name=test.test_name,
-            test_code=test.test_code,
-            date=target_date,
-            is_available=is_available,
-            equipment_status=equipment_status,
-            last_calibration_date=test.last_calibration_date,
-            notes=""
-        )
-        db.add(new_test)
+        existing_test = db.query(TestAvailability).filter(
+            TestAvailability.phc_id == phc.id,
+            TestAvailability.test_name == test.test_name,
+            TestAvailability.date == target_date
+        ).first()
+        if existing_test:
+            existing_test.is_available = is_available
+            existing_test.equipment_status = equipment_status
+            existing_test.last_calibration_date = test.last_calibration_date
+        else:
+            new_test = TestAvailability(
+                phc_id=phc.id,
+                test_name=test.test_name,
+                test_code=test.test_code,
+                date=target_date,
+                is_available=is_available,
+                equipment_status=equipment_status,
+                last_calibration_date=test.last_calibration_date,
+                notes=""
+            )
+            db.add(new_test)
 
 
 @app.post("/api/simulation/advance-day", response_model=SimulationResponse)
@@ -1151,16 +1172,27 @@ async def advance_simulation_day(request: SimulationAdvanceRequest, db: Session 
                             "change": new_stock - current_stock
                         })
                     
-                    stock = Stock(
-                        phc_id=phc_id,
-                        medicine_id=medicine.id,
-                        date=new_date,
-                        quantity=new_stock,
-                        min_required=medicine.min_stock_threshold,
-                        last_restocked=last_restocked,
-                        restock_arrives_on=restock_arrives_on
-                    )
-                    db.add(stock)
+                    existing_stock = db.query(Stock).filter(
+                        Stock.phc_id == phc_id,
+                        Stock.medicine_id == medicine.id,
+                        Stock.date == new_date
+                    ).first()
+                    if existing_stock:
+                        existing_stock.quantity = new_stock
+                        existing_stock.min_required = medicine.min_stock_threshold
+                        existing_stock.last_restocked = last_restocked
+                        existing_stock.restock_arrives_on = restock_arrives_on
+                    else:
+                        stock = Stock(
+                            phc_id=phc_id,
+                            medicine_id=medicine.id,
+                            date=new_date,
+                            quantity=new_stock,
+                            min_required=medicine.min_stock_threshold,
+                            last_restocked=last_restocked,
+                            restock_arrives_on=restock_arrives_on
+                        )
+                        db.add(stock)
                     changes["district_summary"]["total_stock_change"] += (new_stock - current_stock)
             
             # Generate test availability
@@ -1173,17 +1205,27 @@ async def advance_simulation_day(request: SimulationAdvanceRequest, db: Session 
                 is_available = random.random() < 0.9
                 equipment_status = "functional" if is_available else random.choice(["maintenance", "broken", "reagent_stockout"])
                 
-                new_test = TestAvailability(
-                    phc_id=phc_id,
-                    test_name=test.test_name,
-                    test_code=test.test_code,
-                    date=new_date,
-                    is_available=is_available,
-                    equipment_status=equipment_status,
-                    last_calibration_date=test.last_calibration_date,
-                    notes=""
-                )
-                db.add(new_test)
+                existing_test = db.query(TestAvailability).filter(
+                    TestAvailability.phc_id == phc_id,
+                    TestAvailability.test_name == test.test_name,
+                    TestAvailability.date == new_date
+                ).first()
+                if existing_test:
+                    existing_test.is_available = is_available
+                    existing_test.equipment_status = equipment_status
+                    existing_test.last_calibration_date = test.last_calibration_date
+                else:
+                    new_test = TestAvailability(
+                        phc_id=phc_id,
+                        test_name=test.test_name,
+                        test_code=test.test_code,
+                        date=new_date,
+                        is_available=is_available,
+                        equipment_status=equipment_status,
+                        last_calibration_date=test.last_calibration_date,
+                        notes=""
+                    )
+                    db.add(new_test)
                 changes["test_changes"].append({
                     "phc_id": phc_id,
                     "phc_name": phc.name,
@@ -1474,16 +1516,27 @@ async def trigger_simulation_event(request: SimulationEventRequest, db: Session 
                         restock_delay = random.randint(3, 5)
                         restock_arrives_on = event_date + timedelta(days=restock_delay)
                     
-                    stock = Stock(
-                        phc_id=request.phc_id,
-                        medicine_id=medicine.id,
-                        date=event_date,
-                        quantity=new_stock,
-                        min_required=medicine.min_stock_threshold,
-                        last_restocked=last_restocked,
-                        restock_arrives_on=restock_arrives_on  # CRITICAL: Save the restock date
-                    )
-                    db.add(stock)
+                    existing_stock = db.query(Stock).filter(
+                        Stock.phc_id == request.phc_id,
+                        Stock.medicine_id == medicine.id,
+                        Stock.date == event_date
+                    ).first()
+                    if existing_stock:
+                        existing_stock.quantity = new_stock
+                        existing_stock.min_required = medicine.min_stock_threshold
+                        existing_stock.last_restocked = last_restocked
+                        existing_stock.restock_arrives_on = restock_arrives_on
+                    else:
+                        stock = Stock(
+                            phc_id=request.phc_id,
+                            medicine_id=medicine.id,
+                            date=event_date,
+                            quantity=new_stock,
+                            min_required=medicine.min_stock_threshold,
+                            last_restocked=last_restocked,
+                            restock_arrives_on=restock_arrives_on
+                        )
+                        db.add(stock)
                 else:
                     # Accelerate medicine usage for disease outbreak
                     if request.event_type == "disease_outbreak":
@@ -1515,17 +1568,27 @@ async def trigger_simulation_event(request: SimulationEventRequest, db: Session 
             
             for test in tests:
                 is_available = random.random() < 0.9
-                new_test = TestAvailability(
-                    phc_id=request.phc_id,
-                    test_name=test.test_name,
-                    test_code=test.test_code,
-                    date=event_date,
-                    is_available=is_available,
-                    equipment_status="functional" if is_available else "maintenance",
-                    last_calibration_date=test.last_calibration_date,
-                    notes=""
-                )
-                db.add(new_test)
+                existing_test = db.query(TestAvailability).filter(
+                    TestAvailability.phc_id == request.phc_id,
+                    TestAvailability.test_name == test.test_name,
+                    TestAvailability.date == event_date
+                ).first()
+                if existing_test:
+                    existing_test.is_available = is_available
+                    existing_test.equipment_status = "functional" if is_available else "maintenance"
+                    existing_test.last_calibration_date = test.last_calibration_date
+                else:
+                    new_test = TestAvailability(
+                        phc_id=request.phc_id,
+                        test_name=test.test_name,
+                        test_code=test.test_code,
+                        date=event_date,
+                        is_available=is_available,
+                        equipment_status="functional" if is_available else "maintenance",
+                        last_calibration_date=test.last_calibration_date,
+                        notes=""
+                    )
+                    db.add(new_test)
                 changes["test_changes"].append({
                     "phc_id": request.phc_id,
                     "phc_name": phc.name,
