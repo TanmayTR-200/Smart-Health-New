@@ -63,6 +63,7 @@ class StockoutPredictor:
     def __init__(self):
         self.models = {}  # Cache for trained models
         self.model_version = "v1.0"
+        self._prediction_cache = {}  # (phc_id, medicine_id, latest_date) -> prediction dict
     
     def prepare_data(self, df: pd.DataFrame, phc_id: int, medicine_id: int) -> pd.DataFrame:
         """Prepare time-series data for Prophet"""
@@ -81,8 +82,8 @@ class StockoutPredictor:
     def predict_stockout(self, df: pd.DataFrame, phc_id: int, medicine_id: int, 
                         min_threshold: int) -> Dict:
         """
-        Predict days until stock-out for a specific PHC-medicine combination
-        Returns prediction with confidence interval
+        Predict days until stock-out for a specific PHC-medicine combination.
+        Uses caching: refits Prophet only when latest data date changes.
         """
         prophet_df = self.prepare_data(df, phc_id, medicine_id)
         
@@ -94,6 +95,7 @@ class StockoutPredictor:
             }
         
         current_stock = prophet_df['y'].iloc[-1]
+        latest_date = prophet_df['ds'].iloc[-1]
         
         # If already below threshold
         if current_stock < min_threshold:
@@ -102,6 +104,11 @@ class StockoutPredictor:
                 "confidence": 1.0,
                 "recommended_action": "IMMEDIATE RESTOCKING REQUIRED"
             }
+        
+        # Check prediction cache — refit only when latest_date changes
+        cache_key = (phc_id, medicine_id, str(latest_date))
+        if cache_key in self._prediction_cache:
+            return self._prediction_cache[cache_key]
         
         # Use Prophet for forecasting
         if PROPHET_AVAILABLE:
@@ -129,11 +136,13 @@ class StockoutPredictor:
                     days_until_stockout = 30  # Safe for next 30 days
                     confidence = 0.7
                 
-                return {
+                result = {
                     "days_until_stockout": days_until_stockout,
                     "confidence": confidence,
                     "recommended_action": self._get_action_recommendation(days_until_stockout)
                 }
+                self._prediction_cache[cache_key] = result
+                return result
                 
             except Exception as e:
                 print(f"Prophet error: {e}, falling back to simple method")
@@ -146,11 +155,17 @@ class StockoutPredictor:
         else:
             days_until_stockout = 0
         
-        return {
+        result = {
             "days_until_stockout": days_until_stockout,
             "confidence": 0.6,
             "recommended_action": self._get_action_recommendation(days_until_stockout)
         }
+        self._prediction_cache[cache_key] = result
+        return result
+    
+    def invalidate_cache(self):
+        """Clear prediction cache — call when simulation advances a day"""
+        self._prediction_cache.clear()
     
     def _get_action_recommendation(self, days: int) -> str:
         """Get recommended action based on days until stockout"""

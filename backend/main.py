@@ -1238,6 +1238,7 @@ async def advance_simulation_day(request: SimulationAdvanceRequest, db: Session 
     
     # Invalidate all caches since data has changed
     ml_manager.redistribution_engine.invalidate_cache()
+    ml_manager.stockout_predictor.invalidate_cache()
     _invalidate_caches()
     
     # Calculate district-wide averages
@@ -1833,6 +1834,7 @@ async def trigger_simulation_event(request: SimulationEventRequest, db: Session 
     
     # Invalidate all caches since data has changed
     ml_manager.redistribution_engine.invalidate_cache()
+    ml_manager.stockout_predictor.invalidate_cache()
     _invalidate_caches()
     
     # Calculate averages (only if we have data)
