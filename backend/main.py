@@ -790,6 +790,16 @@ def _generate_day_for_phc(db, phc, target_date, generator, changes, medicines_ca
     footfall.follow_up_patients = total_patients - footfall.new_patients - footfall.emergency_cases
     db.add(footfall)
     
+    changes["footfall_changes"].append({
+        "phc_id": phc.id,
+        "phc_name": phc.name,
+        "date": target_date.strftime("%Y-%m-%d"),
+        "total_patients": total_patients,
+        "emergency_cases": footfall.emergency_cases
+    })
+    changes["district_summary"]["total_patients"] += total_patients
+    changes["district_summary"]["total_emergency"] += footfall.emergency_cases
+    
     # Generate bed occupancy
     existing_beds = db.query(BedOccupancy).filter(BedOccupancy.phc_id == phc.id).first()
     reserved_beds_stable = existing_beds.reserved_beds if existing_beds else min(max(0, int(phc.total_beds * 0.1)), 2)
@@ -815,6 +825,14 @@ def _generate_day_for_phc(db, phc, target_date, generator, changes, medicines_ca
     )
     db.add(bed)
     
+    changes["bed_changes"].append({
+        "phc_id": phc.id,
+        "phc_name": phc.name,
+        "date": target_date.strftime("%Y-%m-%d"),
+        "occupancy_rate": bed.occupancy_rate,
+        "available_beds": bed.available_beds
+    })
+    
     # Generate doctor attendance
     base_attendance = random.uniform(0.78, 0.88)
     if target_date.weekday() == 0:
@@ -836,6 +854,14 @@ def _generate_day_for_phc(db, phc, target_date, generator, changes, medicines_ca
         reasons=""
     )
     db.add(attendance)
+    
+    changes["attendance_changes"].append({
+        "phc_id": phc.id,
+        "phc_name": phc.name,
+        "date": target_date.strftime("%Y-%m-%d"),
+        "attendance_rate": attendance.attendance_rate,
+        "absent_doctors": attendance.absent_doctors
+    })
     
     # Generate stock updates for each medicine (batch query latest stocks)
     medicines = medicines_cache if medicines_cache is not None else db.query(Medicine).all()
@@ -1747,11 +1773,10 @@ async def trigger_simulation_event(request: SimulationEventRequest, db: Session 
     _invalidate_caches()
     
     # Calculate averages (only if we have data)
-    if request.duration_days > 0:
-        if len(changes["attendance_changes"]) > 0:
-            changes["district_summary"]["avg_attendance"] = round(changes["district_summary"]["avg_attendance"] / request.duration_days, 2)
-        if len(changes["bed_changes"]) > 0:
-            changes["district_summary"]["avg_bed_occupancy"] = round(changes["district_summary"]["avg_bed_occupancy"] / request.duration_days, 2)
+    if len(changes["attendance_changes"]) > 0:
+        changes["district_summary"]["avg_attendance"] = round(changes["district_summary"]["avg_attendance"] / len(changes["attendance_changes"]), 2)
+    if len(changes["bed_changes"]) > 0:
+        changes["district_summary"]["avg_bed_occupancy"] = round(changes["district_summary"]["avg_bed_occupancy"] / len(changes["bed_changes"]), 2)
     
     return SimulationResponse(
         success=True,
