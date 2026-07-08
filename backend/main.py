@@ -1669,6 +1669,51 @@ async def trigger_simulation_event(request: SimulationEventRequest, db: Session 
                 })
                 changes["district_summary"]["total_patients"] += footfall.total_patients
                 changes["district_summary"]["total_emergency"] += footfall.emergency_cases
+            
+            # Generate bed occupancy for this date if it doesn't exist
+            bed = db.query(BedOccupancy).filter(
+                BedOccupancy.phc_id == request.phc_id,
+                BedOccupancy.date == event_date
+            ).first()
+            
+            if not bed:
+                existing_bed = db.query(BedOccupancy).filter(
+                    BedOccupancy.phc_id == request.phc_id
+                ).first()
+                if existing_bed:
+                    reserved_beds_stable = existing_bed.reserved_beds
+                else:
+                    reserved_beds_stable = min(max(0, int(phc.total_beds * 0.1)), 2)
+                
+                seasonal = generator.generate_seasonal_factor(event_date)
+                base_occupancy = random.uniform(0.65, 0.85) * seasonal * np.random.normal(1.0, 0.1)
+                base_occupancy = max(0.5, min(0.98, base_occupancy))
+                occupied = int(phc.total_beds * base_occupancy)
+                reserved = reserved_beds_stable
+                occupied = min(occupied, phc.total_beds - reserved)
+                occupied = max(0, occupied)
+                available = max(0, phc.total_beds - occupied - reserved)
+                occupancy_rate = round((occupied / phc.total_beds) * 100, 2) if phc.total_beds > 0 else 0
+                
+                bed = BedOccupancy(
+                    phc_id=request.phc_id,
+                    date=event_date,
+                    total_beds=phc.total_beds,
+                    occupied_beds=occupied,
+                    reserved_beds=reserved,
+                    available_beds=available,
+                    occupancy_rate=occupancy_rate
+                )
+                db.add(bed)
+            
+            changes["bed_changes"].append({
+                "phc_id": request.phc_id,
+                "phc_name": phc.name,
+                "date": event_date.strftime("%Y-%m-%d"),
+                "occupancy_rate": bed.occupancy_rate,
+                "available_beds": bed.available_beds
+            })
+            changes["district_summary"]["avg_bed_occupancy"] += bed.occupancy_rate
         
         changes["message"] = f"Doctor absence spike at {phc.name}: {absence_rate*100:.0f}% absenteeism for {request.duration_days} days"
     
