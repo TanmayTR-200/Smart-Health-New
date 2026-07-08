@@ -493,9 +493,9 @@ class RedistributionEngine:
                 restock_arrives_on = row.get('restock_arrives_on', None)
                 has_pending_restock = pd.notna(restock_arrives_on) if restock_arrives_on else False
                 
-                if stock_ratio > 1.5:  # Excess stock (> 1.5x threshold)
-                    # Calculate actual excess above safety reserve (1.2x threshold)
-                    actual_excess = int(current_stock - (min_threshold * 1.2))
+                if stock_ratio > 2.0:  # Excess stock (> 2x threshold)
+                    # Calculate actual excess above safety reserve (1.5x threshold)
+                    actual_excess = int(current_stock - (min_threshold * 1.5))
                     if actual_excess > 0:  # Only include if there's actual surplus to transfer
                         district_excess_phcs.add(phc_id)
                         excess_phcs.append({
