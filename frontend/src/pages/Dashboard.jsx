@@ -308,12 +308,12 @@ function Dashboard() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <UserCheck className="h-3.5 w-3.5 text-slate-400" />
-                        <span className="text-slate-500 text-xs">Attend:</span>
+                        <span className="text-slate-500 text-xs">Doc Attendance:</span>
                         <span className="font-semibold text-slate-700 text-xs">{phc.attendance_rate.toFixed(1)}%</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Bed className="h-3.5 w-3.5 text-slate-400" />
-                        <span className="text-slate-500 text-xs">Beds:</span>
+                        <span className="text-slate-500 text-xs">Bed Occupancy:</span>
                         <span className="font-semibold text-slate-700 text-xs">{phc.bed_occupancy_rate.toFixed(1)}%</span>
                       </div>
                     </div>
