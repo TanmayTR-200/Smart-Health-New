@@ -132,7 +132,6 @@ function Dashboard() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               LIVE
             </span>
-            <span className="text-[10px] text-slate-400 ml-1">First load may take 30-60s (server cold start)</span>
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight">
             <span className="gradient-text">{t('districtHealthDashboard')}</span>
