@@ -174,7 +174,7 @@ async def startup_event():
     print("✓ Smart Health API started successfully")
 
 
-@app.get("/", response_model=MessageResponse)
+@app.api_route("/", methods=["GET", "HEAD"], response_model=MessageResponse)
 async def root():
     """Health check endpoint"""
     return {"message": "Smart Health API is running", "success": True}
