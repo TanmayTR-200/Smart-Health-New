@@ -318,7 +318,6 @@ Smart-Health-New/
 │   └── start_demo.ps1                 # One-command demo launcher
 ├── Dockerfile
 ├── setup_database.py
-├── reset_db.py
 ├── SCOPE.md
 └── README.md
 ```

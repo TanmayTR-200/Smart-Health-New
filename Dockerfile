@@ -15,7 +15,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./backend/
 COPY data/ ./data/
 COPY setup_database.py ./setup_database.py
-COPY reset_db.py ./reset_db.py
 
 # Create data/output directory for generated CSVs
 RUN mkdir -p data/output
