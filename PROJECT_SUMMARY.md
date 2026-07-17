@@ -12,7 +12,7 @@ A full-stack AI-powered district health management system for monitoring and opt
 
 ### Backend (FastAPI + Python)
 - **Framework**: FastAPI with async support
-- **Database**: SQLAlchemy ORM (SQLite/PostgreSQL)
+- **Database**: SQLAlchemy ORM (SQLite local / Neon PostgreSQL production)
 - **ML Models**: Prophet, Isolation Forest, custom optimization engines, Google Gemini AI
 - **API**: 25+ REST endpoints with automatic documentation
 - **Simulation**: Live simulation mode for demo purposes
@@ -30,6 +30,12 @@ A full-stack AI-powered district health management system for monitoring and opt
 - **Schema**: 10 database tables with proper relationships
 - **Seeding**: Batch insertion script for efficient data loading
 - **Test Availability**: Diagnostic test tracking for PHC labs
+
+### Database
+- **Local development**: SQLite — no setup required; a `smart_health_new.db` file is created automatically.
+- **Production**: Neon serverless PostgreSQL (free tier, no credit card required, scales to zero after inactivity — first request after idle may take a few seconds to wake up).
+- `DATABASE_URL` is set via Render's dashboard environment variables and is never committed to the repo.
+- The backend auto-detects the connection string format (`postgres://` / `postgresql://`, including Neon's `?sslmode=require`) and converts it to the SQLAlchemy `postgresql+psycopg2://` driver transparently.
 
 ---
 

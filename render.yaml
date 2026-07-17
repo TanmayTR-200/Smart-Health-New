@@ -1,12 +1,7 @@
 # Render Blueprint for Smart Health
-# Uses PostgreSQL so data persists across auto-deploys
+# Uses Neon (serverless PostgreSQL) so data persists across auto-deploys
+# DATABASE_URL is set manually in Render's dashboard (not committed to this file)
 # Go to: Dashboard → New → Blueprint → select your repo
-
-databases:
-  - name: smart-health-new-db
-    databaseName: smart_health_new
-    plan: free
-    ipAllowList: []
 
 services:
   - type: web
@@ -21,9 +16,7 @@ services:
       - key: PYTHON_VERSION
         value: "3.11.9"
       - key: DATABASE_URL
-        fromDatabase:
-          name: smart-health-new-db
-          property: connectionString
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: API_ENV

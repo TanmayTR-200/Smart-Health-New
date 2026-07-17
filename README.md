@@ -96,7 +96,7 @@ Smart Health is a full-stack AI-powered platform designed to bring real-time vis
 | **Backend** | FastAPI · SQLAlchemy · Pydantic | Async REST API with auto-generated docs |
 | **ML/AI** | Prophet · scikit-learn · SciPy · Google Gemini | Forecasting, anomaly detection, optimization, reasoning |
 | **Frontend** | React 18 · Vite 5 · Tailwind CSS · Recharts | Modern glassmorphism UI with responsive charts |
-| **Database** | SQLite (demo) / PostgreSQL (production) | Time-series schema with 10 relational tables |
+| **Database** | SQLite (local) / Neon PostgreSQL (production) | Time-series schema with 10 relational tables |
 | **DevOps** | Docker · Vercel-ready frontend | Containerized backend, static frontend deploy |
 
 ---
@@ -224,6 +224,17 @@ GEMINI_API_KEY=your_google_gemini_api_key    # Optional — system works without
 DATABASE_URL=sqlite:///smart_health_new.db       # Or postgresql://user:pass@host:5432/dbname
 ```
 
+### Database
+
+| Environment | Database | Notes |
+|---|---|---|
+| **Local development** | SQLite | Default — no setup required; a `smart_health_new.db` file is created automatically |
+| **Production (Render)** | Neon PostgreSQL | Serverless Postgres free tier (no credit card required) |
+
+- **Neon scales to zero** after a period of inactivity. The first request after idle time may take a few seconds while the database wakes up.
+- `DATABASE_URL` is **set via Render's dashboard environment variables** — it is never committed to the repo.
+- The backend auto-detects the URL format: `postgres://` / `postgresql://` (including Neon's `?sslmode=require` query parameter) are converted to the SQLAlchemy `postgresql+psycopg2://` driver transparently. SQLite URLs are used as-is.
+
 ---
 
 ## 📡 API Documentation
@@ -347,7 +358,7 @@ docker run -p 8000:8000 -e GEMINI_API_KEY=$KEY smart-health-new
 ```
 
 ### Production Path
-- **Database**: Switch from SQLite to PostgreSQL
+- **Database**: Neon serverless PostgreSQL (free tier, no card required, scales to zero)
 - **AI**: Configure `GEMINI_API_KEY` for full Gemini-powered reasoning
 - **Integration**: Connect to India's HMIS/IHIP APIs for real data
 - **Scaling**: Async FastAPI + connection pooling + ML model caching
