@@ -236,6 +236,11 @@ function Recommendations() {
                     <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${getPriorityColor(rec.urgency)}`}>
                       {rec.urgency}
                     </span>
+                    {rec.method && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-50 text-violet-600 border border-violet-100">
+                        {rec.method.replace(/_/g, ' ')}
+                      </span>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

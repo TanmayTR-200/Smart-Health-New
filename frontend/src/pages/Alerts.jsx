@@ -248,6 +248,11 @@ function Alerts() {
                       <span className={`px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${getSeverityColor(alert.severity)}`}>
                         {alert.severity}
                       </span>
+                      {alert.method && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-50 text-violet-600 border border-violet-100">
+                          {alert.method.replace(/_/g, ' ')}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-2 mb-3">

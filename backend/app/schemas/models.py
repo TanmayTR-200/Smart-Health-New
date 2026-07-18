@@ -263,6 +263,7 @@ class AlertItem(BaseModel):
     description: str
     created_at: datetime
     is_resolved: bool
+    method: Optional[str] = None
 
 
 # ML Model Response Schemas

@@ -691,10 +691,6 @@ async def get_anomalies(db: Session = Depends(get_db)):
     # Detect anomalies
     anomalies = ml_manager.anomaly_detector.detect_anomalies(phc_scores)
     
-    # Tag each anomaly with the detection method used
-    for anomaly in anomalies:
-        anomaly["method"] = "average_threshold"
-    
     return anomalies
 
 
@@ -2088,7 +2084,8 @@ async def get_alerts(db: Session = Depends(get_db)):
             phc_name=anomaly.get('phc_name', 'Unknown'),
             description=anomaly.get('description', ''),
             created_at=datetime.now(),
-            is_resolved=False
+            is_resolved=False,
+            method=anomaly.get('method', 'unknown')
         ))
     
     return result

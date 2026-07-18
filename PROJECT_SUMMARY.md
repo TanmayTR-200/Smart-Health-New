@@ -121,12 +121,14 @@ A full-stack AI-powered district health management system for monitoring and opt
 - **Features**: Trend detection, monsoon 1.3×, winter 1.15×, weekends 0.7×
 - **API `method` field**: `"seasonal_trend"`
 
-### 3. Anomaly Detection (Average-Threshold)
-- **Type**: District average comparison
-- **Input**: Composite health scores (stock 35%, attendance 25%, beds 20%, tests 20%)
-- **Output**: Underperforming PHCs with severity
-- **Details**: IsolationForest is imported and initialised but the deployed path flags PHCs whose health score falls below the district average
-- **API `method` field**: `"average_threshold"`
+### 3. Anomaly Detection (IsolationForest)
+- **Type**: Unsupervised outlier detection + district average comparison
+- **Input**: 4-component health feature vector per PHC (stock, attendance, beds, tests)
+- **Output**: Underperforming PHCs with severity and real anomaly score
+- **Model**: `fit_predict()` flags outliers (-1), `decision_function()` produces continuous anomaly score
+- **Severity**: Combines both signals — model outlier + below average escalates, below average but not flagged de-escalates
+- **Fallback**: Average-threshold only when <4 PHCs (too few for meaningful fit)
+- **API `method` field**: `"isolation_forest"` or `"average_threshold"`
 
 ### 4. Redistribution Engine (Linear Programming)
 - **Type**: scipy.optimize.linprog with rule-based fallback
@@ -406,7 +408,7 @@ npm run dev
 **AI/ML (Hard)**:
 - Stock-out prediction (Prophet locally, moving average in production — `method` field in API response)
 - Demand forecasting (seasonal trend — not a learned model, clearly labelled)
-- Anomaly detection (average-threshold comparison — IsolationForest imported but not in the deployed path)
+- Anomaly detection (IsolationForest on 4-component health vector, with average-threshold fallback)
 - Resource redistribution (linear programming via scipy.optimize.linprog, with rule-based fallback)
 - Gemini-powered reasoning and translation
 
@@ -420,7 +422,7 @@ npm run dev
 ### 3. Technical Depth
 - 4 distinct ML models (not just threshold alerts)
 - Time-series forecasting with confidence intervals (Prophet local / moving average deployed)
-- Average-threshold anomaly detection
+- IsolationForest anomaly detection with average-threshold fallback
 - Linear programming optimization with distance cost matrix and rule-based fallback
 - Live simulation mode for demo
 - Multilingual support for accessibility

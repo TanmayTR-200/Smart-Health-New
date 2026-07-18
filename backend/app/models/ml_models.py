@@ -393,30 +393,67 @@ class AnomalyDetector:
     
     def detect_anomalies(self, phc_scores: List[Dict]) -> List[Dict]:
         """
-        Detect anomalous PHCs based on health scores.
-        Flags any PHC whose health score is below the district average.
+        Detect anomalous PHCs using IsolationForest on the four-component
+        health feature vector, combined with district-average comparison.
+
+        Falls back to pure average-threshold logic when IsolationForest
+        cannot fit (too few PHCs or exception).
         """
         if len(phc_scores) < 2:
             return []
 
         avg_health = sum(s['health_score'] for s in phc_scores) / len(phc_scores)
 
+        # --- Try IsolationForest on the 4-component feature vector -------
+        ifo_labels = {}     # phc_id -> -1 (outlier) or 1 (normal)
+        ifo_scores = {}     # phc_id -> decision_function value (more negative = more anomalous)
+        method = "isolation_forest"
+
+        if len(phc_scores) >= 4:
+            try:
+                feature_cols = ['stock_health', 'attendance_rate',
+                                'bed_occupancy_rate', 'test_availability_rate']
+                X = np.array([[s[c] for c in feature_cols] for s in phc_scores])
+                X_scaled = self.scaler.fit_transform(X)
+                labels = self.model.fit_predict(X_scaled)
+                scores = self.model.decision_function(X_scaled)
+                for i, s in enumerate(phc_scores):
+                    ifo_labels[s['phc_id']] = int(labels[i])
+                    ifo_scores[s['phc_id']] = float(scores[i])
+            except Exception as e:
+                print(f"[ANOMALY] IsolationForest failed: {e} — falling back to average_threshold")
+                method = "average_threshold"
+        else:
+            print(f"[ANOMALY] Only {len(phc_scores)} PHCs — IsolationForest needs >=4 for meaningful output, using average_threshold")
+            method = "average_threshold"
+
+        # --- Build anomaly list combining both signals -------------------
         anomalies = []
         for score_dict in phc_scores:
             health_score = score_dict['health_score']
             if health_score < avg_health:
-                # Determine severity based on how far below average
                 gap = avg_health - health_score
-                if health_score < 60:
+                is_outlier = ifo_labels.get(score_dict['phc_id']) == -1
+                ifo_score = ifo_scores.get(score_dict['phc_id'], 0.0)
+
+                # Severity incorporates BOTH signals:
+                # - IsolationForest outlier flagged AND below average → escalate
+                # - Below average but NOT flagged by model → de-escalate
+                if health_score < 60 or (is_outlier and gap >= 5):
                     severity = "critical"
-                elif gap >= 10:
+                elif gap >= 10 or (is_outlier and gap >= 3):
                     severity = "high"
                 elif gap >= 3:
                     severity = "medium"
                 else:
                     severity = "low"
 
-                # Generate description based on weak areas
+                # If the model did NOT flag this PHC as an outlier, de-escalate
+                # by one level (the average gap alone is a weaker signal)
+                if method == "isolation_forest" and not is_outlier and severity != "low":
+                    deescalate = {"critical": "high", "high": "medium", "medium": "low"}
+                    severity = deescalate.get(severity, severity)
+
                 weak_areas = []
                 if score_dict['stock_health'] < 70:
                     weak_areas.append("stock management")
@@ -430,6 +467,8 @@ class AnomalyDetector:
                 description = f"PHC health score ({health_score:.1f}) below district average ({avg_health:.1f})"
                 if weak_areas:
                     description += f". Weak areas: {', '.join(weak_areas)}"
+                if is_outlier:
+                    description += f". Flagged as statistical outlier by IsolationForest (score={ifo_score:.3f})"
 
                 anomalies.append({
                     "phc_id": score_dict['phc_id'],
@@ -438,7 +477,10 @@ class AnomalyDetector:
                     "anomaly_type": "underperforming",
                     "severity": severity,
                     "score": round(health_score, 2),
-                    "anomaly_score": round(gap, 2),
+                    "avg_deviation": round(gap, 2),
+                    "anomaly_score": round(ifo_score, 4),
+                    "is_outlier": is_outlier,
+                    "method": method,
                     "description": description,
                     "details": score_dict
                 })
