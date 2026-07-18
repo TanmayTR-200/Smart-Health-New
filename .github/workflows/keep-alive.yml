@@ -1,0 +1,23 @@
+# This workflow pings the deployed Render backend every 10 minutes to prevent
+# Render free-tier spin-down (15 min inactivity) and Neon database scale-to-zero.
+# Remove this file once the project is on an always-on paid tier.
+#
+# Manual trigger: GitHub repo > Actions > Keep Alive > Run workflow
+name: Keep Alive
+
+on:
+  schedule:
+    # Every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render health check
+        run: |
+          curl --max-time 10 -s -o /dev/null -w "%{http_code}" \
+            https://smart-health-new-api.onrender.com/ \
+            || echo "Request failed (Render may be cold-starting) — exiting gracefully"
+        continue-on-error: true
