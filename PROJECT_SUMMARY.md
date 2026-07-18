@@ -114,12 +114,13 @@ A full-stack AI-powered district health management system for monitoring and opt
 - **Deployed (Render free tier)**: 7-day moving average fallback (confidence 0.6) — Prophet OOMs on Render's 512MB free tier
 - **API `method` field**: `"prophet"` or `"moving_average"`
 
-### 2. Demand Forecasting (Seasonal Trend)
-- **Type**: Trend + fixed seasonal multipliers (not a learned model)
-- **Input**: Historical footfall data
-- **Output**: 7-day patient volume forecast
-- **Features**: Trend detection, monsoon 1.3×, winter 1.15×, weekends 0.7×
-- **API `method` field**: `"seasonal_trend"`
+### 2. Demand Forecasting (Prophet / Seasonal Trend)
+- **Type**: Time-series forecasting (Prophet locally) / trend + seasonal multipliers (fallback)
+- **Input**: Historical footfall data (date, total_patients)
+- **Output**: 7-day patient volume forecast with confidence intervals
+- **Local**: Prophet with real yhat_lower/yhat_upper confidence bounds
+- **Fallback**: Trend + fixed seasonal multipliers (monsoon 1.3×, winter 1.15×) when Prophet unavailable or <14 days data
+- **API `method` field**: `"prophet"` or `"seasonal_trend"`
 
 ### 3. Anomaly Detection (IsolationForest)
 - **Type**: Unsupervised outlier detection + district average comparison

@@ -53,6 +53,9 @@ backend/backend.log
 # Pyright
 pyrightconfig.json
 
+# Pytest
+.pytest_cache/
+
 # Temp files
 *.tmp
 *.bak

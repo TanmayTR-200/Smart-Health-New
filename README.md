@@ -133,7 +133,7 @@ Smart Health is a full-stack AI-powered platform designed to bring real-time vis
 | Model | Type | What It Does |
 |---|---|---|
 | **Stock-out Prediction** | Prophet time-series (local) / 7-day moving average (deployed) | Forecasts days until stockout per medicine per PHC. Prophet runs locally with confidence 0.8; Render free tier OOMs on Prophet, so production uses the moving average fallback (confidence 0.6). `method` field in API response reports which one ran. |
-| **Demand Forecasting** | Seasonal trend forecasting | Predicts 7-day patient footfall using recent trend detection + fixed seasonal multipliers (monsoon 1.3×, winter 1.15×, weekends 0.7×). Not a learned model — `method: "seasonal_trend"`. |
+| **Demand Forecasting** | Prophet time-series (local) / seasonal trend (fallback) | Fits Prophet on PHC footfall history to forecast the next 7 days with real confidence intervals from `yhat_lower`/`yhat_upper`. Falls back to trend + fixed seasonal multipliers (monsoon 1.3×, winter 1.15×) when Prophet is unavailable or <14 days of data. `method: "prophet"` or `"seasonal_trend"`. |
 | **Anomaly Detection** | IsolationForest with average-threshold fallback | Fits IsolationForest on the 4-component health feature vector (stock, attendance, beds, tests) per PHC. `decision_function()` produces a real anomaly score; `fit_predict()` flags statistical outliers. Severity combines both the model signal and the district-average gap — outliers below average escalate, non-outliers de-escalate. Falls back to average-threshold when <4 PHCs. `method: "isolation_forest"` or `"average_threshold"`. |
 | **Redistribution Engine** | Linear programming (scipy.optimize.linprog) with rule-based fallback | Minimises unmet deficit + transfer distance across a 6×6 PHC distance matrix. Falls back to greedy threshold matching when total deficit exceeds total excess (LP infeasible). `method` field reports `"linear_programming"` or `"rule_based_fallback"`. |
 | **Gemini AI Service** | Google Gemini API | Generates natural-language reasoning for recommendations and real-time multilingual translation. Degrades to template text if API key is missing. |
@@ -210,6 +210,12 @@ npm run dev
 | Frontend | http://localhost:5173 |
 | Backend API | http://localhost:8000 |
 | API Docs (Swagger) | http://localhost:8000/docs |
+
+### Tests
+
+```bash
+cd backend && pytest
+```
 
 ### Option 3: Docker
 

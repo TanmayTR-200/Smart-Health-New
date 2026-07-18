@@ -186,20 +186,22 @@ class StockoutPredictor:
 
 
 class DemandForecaster:
-    """Seasonal trend forecasting for patient footfall"""
-    
+    """Patient footfall forecasting — Prophet time-series with seasonal trend fallback"""
+
     def __init__(self):
-        self.model_version = "v1.0"
-    
+        self.model_version = "v2.0"
+
     def forecast_footfall(self, df: pd.DataFrame, phc_id: int, days: int = 7) -> Dict:
         """
-        Forecast footfall for next N days using seasonal trend forecasting.
-        Combines recent trend detection with fixed seasonal multipliers
-        (monsoon, winter, weekly patterns) — not a learned model.
+        Forecast footfall for next N days.
+
+        Primary method: Prophet time-series on (date, total_patients).
+        Falls back to seasonal trend + fixed multipliers when Prophet is
+        unavailable or there are fewer than 14 days of history.
         """
         phc_data = df[df['phc_id'] == phc_id].copy()
         phc_data = phc_data.sort_values('date')
-        
+
         if len(phc_data) < 14:
             return {
                 "method": "seasonal_trend",
@@ -208,12 +210,55 @@ class DemandForecaster:
                 "confidence_upper": 0,
                 "trend": "insufficient_data"
             }
-        
-        # Calculate recent average and trend
+
+        # --- Prophet path ---------------------------------------------------
+        if PROPHET_AVAILABLE:
+            try:
+                prophet_df = pd.DataFrame({
+                    'ds': pd.to_datetime(phc_data['date']),
+                    'y': phc_data['total_patients']
+                })
+                model = Prophet(
+                    daily_seasonality=False,
+                    weekly_seasonality=True,
+                    yearly_seasonality=True,
+                    changepoint_prior_scale=0.05
+                )
+                model.fit(prophet_df)
+                future = model.make_future_dataframe(periods=days)
+                forecast = model.predict(future)
+                forecast_tail = forecast.tail(days)
+
+                predicted = int(forecast_tail['yhat'].mean())
+                confidence_lower = int(forecast_tail['yhat_lower'].min())
+                confidence_upper = int(forecast_tail['yhat_upper'].max())
+
+                # Trend detection from Prophet's slope
+                if len(forecast) >= 2:
+                    slope = forecast['yhat'].iloc[-1] - forecast['yhat'].iloc[-days - 1]
+                    if slope > phc_data['total_patients'].mean() * 0.05:
+                        trend = "increasing"
+                    elif slope < phc_data['total_patients'].mean() * -0.05:
+                        trend = "decreasing"
+                    else:
+                        trend = "stable"
+                else:
+                    trend = "stable"
+
+                return {
+                    "method": "prophet",
+                    "predicted_footfall": predicted,
+                    "confidence_lower": confidence_lower,
+                    "confidence_upper": confidence_upper,
+                    "trend": trend
+                }
+            except Exception as e:
+                print(f"[DEMAND] Prophet error: {e} — falling back to seasonal_trend")
+
+        # --- Seasonal trend fallback ----------------------------------------
         recent_7 = phc_data.tail(7)['total_patients'].mean()
         recent_14 = phc_data.tail(14)['total_patients'].mean()
-        
-        # Simple trend detection
+
         if recent_7 > recent_14 * 1.1:
             trend = "increasing"
             trend_factor = 1.05
@@ -223,27 +268,20 @@ class DemandForecaster:
         else:
             trend = "stable"
             trend_factor = 1.0
-        
-        # Seasonal adjustment (simplified) - use latest data date, not wall-clock
-        if len(phc_data) > 0:
-            latest_data_date = pd.to_datetime(phc_data['date'].iloc[-1])
-            current_month = latest_data_date.month
-        else:
-            current_month = datetime.now().month
+
+        latest_data_date = pd.to_datetime(phc_data['date'].iloc[-1])
+        current_month = latest_data_date.month
         seasonal_factor = 1.0
-        if current_month in [6, 7, 8, 9]:  # Monsoon
+        if current_month in [6, 7, 8, 9]:
             seasonal_factor = 1.3
-        elif current_month in [12, 1, 2]:  # Winter
+        elif current_month in [12, 1, 2]:
             seasonal_factor = 1.15
-        
-        # Forecast
+
         base_prediction = recent_7 * trend_factor * seasonal_factor
         predicted = int(base_prediction)
-        
-        # Confidence interval (±20%)
         confidence_lower = int(predicted * 0.8)
         confidence_upper = int(predicted * 1.2)
-        
+
         return {
             "method": "seasonal_trend",
             "predicted_footfall": predicted,
