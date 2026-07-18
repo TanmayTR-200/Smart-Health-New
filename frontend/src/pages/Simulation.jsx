@@ -161,7 +161,7 @@ function Simulation() {
               <p className="text-sm text-slate-500 mt-0.5">
                 {simulationMode
                   ? 'Simulation is active. Dashboard and alerts will reflect simulated changes.'
-                  : 'Activate simulation mode to demonstrate live system reactions during your demo.'}
+                  : 'Activate simulation mode to test live system reactions to events.'}
               </p>
               {simulationStatus && (
                 <p className="text-xs text-slate-400 mt-1">{simulationStatus.message}</p>
@@ -493,13 +493,13 @@ function Simulation() {
         </div>
       )}
 
-      {/* Demo Instructions */}
+      {/* Simulation Guide */}
       <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6">
         <div className="flex items-center gap-2 mb-4">
           <div className="bg-amber-100 p-2 rounded-lg">
             <AlertTriangle className="h-5 w-5 text-amber-600" />
           </div>
-          <h3 className="text-lg font-bold text-slate-800">Demo Instructions</h3>
+          <h3 className="text-lg font-bold text-slate-800">Simulation Guide</h3>
         </div>
         <ul className="space-y-3 text-sm text-slate-600">
           <li className="flex items-start gap-2">
@@ -520,7 +520,7 @@ function Simulation() {
           </li>
           <li className="flex items-start gap-2">
             <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 font-bold flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">5</span>
-            <span><strong className="text-slate-800">Live Demo Flow:</strong> After triggering an event, navigate to Dashboard, Alerts, and Recommendations pages to show how the entire system reacts in real-time.</span>
+            <span><strong className="text-slate-800">Live System Flow:</strong> After triggering an event, navigate to Dashboard, Alerts, and Recommendations pages to see how the entire system reacts in real-time.</span>
           </li>
         </ul>
       </div>

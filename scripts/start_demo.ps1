@@ -1,9 +1,9 @@
-# Smart Health - One-Click Demo Starter (PowerShell)
+# Smart Health - One-Click Starter (PowerShell)
 # This script handles EVERYTHING automatically
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Smart Health - Demo Starter" -ForegroundColor Cyan
+Write-Host "  Smart Health - Quick Start" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -63,7 +63,7 @@ Start-Process "http://localhost:5173"
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
-Write-Host "  ✓ Demo is ready!" -ForegroundColor Green
+Write-Host "  ✓ Smart Health is running!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "📊 Frontend: http://localhost:5173" -ForegroundColor Cyan
@@ -71,7 +71,6 @@ Write-Host "🔧 Backend:  http://localhost:8000" -ForegroundColor Cyan
 Write-Host "📚 API Docs: http://localhost:8000/docs" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "🎯 Go to Simulation page: http://localhost:5173/simulation" -ForegroundColor Yellow
-Write-Host "   The PHC dropdown should now be populated!" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Press any key to exit this window (servers will keep running)..." -ForegroundColor Gray
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

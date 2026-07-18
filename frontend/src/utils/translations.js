@@ -103,7 +103,7 @@ export const translations = {
     // Simulation
     simulationControlPanel: "Simulation Control Panel",
     simulationMode: "Simulation Mode",
-    simulationDescription: "Live demo tool to simulate events and see real-time system reactions",
+    simulationDescription: "Simulation tool to trigger events and observe real-time system reactions",
     advanceOneDay: "Advance 1 Day",
     advanceDayDescription: "Move simulated clock forward by one day",
     triggerEvent: "Trigger Event",

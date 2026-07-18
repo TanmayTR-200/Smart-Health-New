@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Database URL - defaults to SQLite for easy demo
+# Database URL - defaults to SQLite for local development
 # Use absolute path to smart-health-new directory for database
 import os
 current_file = os.path.abspath(__file__)  # backend/app/database/connection.py

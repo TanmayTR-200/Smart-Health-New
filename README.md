@@ -4,14 +4,14 @@
 
 ### AI-Powered District Health Management System
 
-An intelligent healthcare management platform that optimizes Primary Health Centre (PHC) operations through ML-powered predictions, anomaly detection, and AI-driven resource redistribution recommendations.
+A full-stack platform that brings real-time visibility and predictive intelligence to district-level health resource management in India. It monitors 6 Primary Health Centres, tracking medicine stocks, patient footfall, bed availability, doctor attendance, and diagnostic test availability — powered by ML forecasting, anomaly detection, linear programming optimization, and Google Gemini AI for natural-language reasoning.
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-Hackathon_Project-orange)](LICENSE)
+[![License](https://img.shields.io/badge/License-Portfolio_Project-blue)](#license)
 
 </div>
 
@@ -20,7 +20,7 @@ An intelligent healthcare management platform that optimizes Primary Health Cent
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
-- [Problem Statement](#-problem-statement)
+- [Engineering Highlights](#-engineering-highlights)
 - [Key Features](#-key-features)
 - [Tech Stack](#-tech-stack)
 - [Architecture](#-architecture)
@@ -30,22 +30,27 @@ An intelligent healthcare management platform that optimizes Primary Health Cent
 - [Project Structure](#-project-structure)
 - [Data Transparency](#-data-transparency)
 - [Deployment](#-deployment)
-- [License](#-license)
+- [License](#license)
 
 ---
 
 ## 📖 Overview
 
-Smart Health is a full-stack AI-powered platform designed to bring real-time visibility and predictive intelligence to district-level health resource management in India. It monitors **6 PHCs/CHCs** across a sample district, tracking medicine stocks, patient footfall, bed availability, doctor attendance, and diagnostic test availability — all powered by ML forecasting and Google Gemini AI for natural-language reasoning.
+Smart Health is a full-stack platform that applies ML forecasting, anomaly detection, and linear programming optimization to a real-world problem: district-level health resource management in India. It monitors **6 PHCs/CHCs** across a sample district, tracking medicine stocks, patient footfall, bed availability, doctor attendance, and diagnostic test availability.
 
-### Why It Matters
+The project explores what happens when you take statistical models (Prophet, IsolationForest, LP) and apply them honestly to an operational domain — including graceful fallbacks when compute constraints prevent the primary model from running, and transparent method reporting so consumers always know which algorithm produced the result they're looking at.
 
-| Problem | Impact |
-|---|---|
-| **30% of PHCs** face regular medicine stock-outs | Patients turned away without treatment |
-| **15–20% doctor absenteeism** in rural areas | Erodes trust in public healthcare |
-| **No real-time district-wide visibility** | Reactive instead of proactive management |
-| **Manual redistribution** is slow & inefficient | Wastage alongside shortages |
+---
+
+## ⚡ Engineering Highlights
+
+**Honest method transparency** — Every ML component (Prophet, IsolationForest, LP optimization) has a tested fallback and reports which method actually ran via a `method` field in the API response. The UI surfaces this as a badge on every page (Dashboard, PHC Detail, Recommendations, Alerts) so you always know whether you're looking at a Prophet prediction or a moving-average fallback.
+
+**pytest suite covering decision boundaries** — Tests verify that fallback triggers fire correctly (<30 days of data → insufficient_data, deficit > excess → rule_based_fallback, <4 PHCs → average_threshold), that LP solutions respect supply/demand constraints, and that IsolationForest genuinely flags outlier PHCs. Not just happy-path tests.
+
+**Linear programming with real scipy.optimize.linprog** — The redistribution engine formulates a genuine LP: minimise unmet deficit + transfer distance across a 6×6 PHC cost matrix, with an equality constraint that makes the problem infeasible when total deficit exceeds total excess (triggering the rule-based fallback). Not a threshold-matching algorithm relabeled as "optimization."
+
+**Multilingual with live AI translation** — UI text uses a dictionary, but all AI-generated content (recommendation reasoning, alert descriptions) is translated live via Google Gemini, with in-memory caching to minimise API calls.
 
 ---
 
@@ -61,14 +66,14 @@ Smart Health is a full-stack AI-powered platform designed to bring real-time vis
 ### 🏥 PHC Detail View
 - 30-day footfall trends with emergency case highlighting
 - Bed occupancy & doctor attendance charts
-- Medicine stock table with low-stock alerts
+- Medicine stock table with low-stock alerts and prediction method badges
 - Individual health score with trend indicators
 
-### 🤖 AI-Powered Redistribution
-- Optimization engine computing optimal transfer routes between PHCs
+### 🤖 Redistribution Recommendations
+- Linear programming engine computing optimal transfer routes between PHCs
 - Priority classification: **Critical → High → Medium**
 - **Google Gemini AI** generates contextual reasoning for each recommendation
-- Transfer quantity calculations with impact projections
+- Transfer quantity calculations with impact projections and route distances
 
 ### 🚨 Alerts Center
 - Real-time anomaly detection across 4 categories:
@@ -95,7 +100,7 @@ Smart Health is a full-stack AI-powered platform designed to bring real-time vis
 |---|---|---|
 | **Backend** | FastAPI · SQLAlchemy · Pydantic | Async REST API with auto-generated docs |
 | **ML/AI** | Prophet · scikit-learn · SciPy · Google Gemini | Forecasting, anomaly detection, optimization, reasoning |
-| **Frontend** | React 18 · Vite 5 · Tailwind CSS · Recharts | Modern glassmorphism UI with responsive charts |
+| **Frontend** | React 18 · Vite 5 · Tailwind CSS · Recharts | Glassmorphism UI with responsive charts |
 | **Database** | SQLite (local) / Neon PostgreSQL (production) | Time-series schema with 10 relational tables |
 | **DevOps** | Docker · Vercel-ready frontend | Containerized backend, static frontend deploy |
 
@@ -138,7 +143,7 @@ Smart Health is a full-stack AI-powered platform designed to bring real-time vis
 | **Redistribution Engine** | Linear programming (scipy.optimize.linprog) with rule-based fallback | Minimises unmet deficit + transfer distance across a 6×6 PHC distance matrix. Falls back to greedy threshold matching when total deficit exceeds total excess (LP infeasible). `method` field reports `"linear_programming"` or `"rule_based_fallback"`. |
 | **Gemini AI Service** | Google Gemini API | Generates natural-language reasoning for recommendations and real-time multilingual translation. Degrades to template text if API key is missing. |
 
-> Every prediction endpoint reports its `method` field in the JSON response so judges can verify which algorithm actually produced the result.
+> Every prediction endpoint reports its `method` field in the JSON response, and the frontend surfaces it as a badge so you can verify which algorithm actually produced the result.
 >
 > **Compute**: Render free tier web service (spins down after 15 min inactivity — first request may take 30-60s).
 > **Database**: Neon serverless PostgreSQL (free tier, scales to zero — first query after idle may take a few seconds). SQLite for local development.
@@ -151,7 +156,7 @@ Smart Health is a full-stack AI-powered platform designed to bring real-time vis
 
 - **Python** 3.9+
 - **Node.js** 18+
-- **PostgreSQL** 14+ (or use bundled SQLite for demo)
+- **PostgreSQL** 14+ (optional — SQLite works out of the box)
 
 ### Option 1: Quick Start (Windows)
 
@@ -286,15 +291,17 @@ Smart-Health-New/
 │   │   │   ├── schema.py              # 10 SQLAlchemy models
 │   │   │   └── connection.py          # DB connection & session
 │   │   ├── models/
-│   │   │   └── ml_models.py           # ML model classes (Prophet, Isolation Forest, etc.)
+│   │   │   └── ml_models.py           # ML model classes (Prophet, Isolation Forest, LP)
 │   │   ├── schemas/
 │   │   │   └── models.py              # Pydantic schemas
 │   │   ├── services/
 │   │   │   └── gemini_service.py      # Google Gemini AI wrapper
 │   │   └── main.py                    # FastAPI app entry point
+│   ├── tests/
+│   │   └── test_ml_models.py          # pytest suite (8 tests)
 │   ├── requirements.txt
-│   ├── .env.example
-│   └── main.py
+│   ├── conftest.py
+│   └── .env.example
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
@@ -324,10 +331,10 @@ Smart-Health-New/
 ├── scripts/
 │   ├── setup.sh                       # Unix setup script
 │   ├── setup.bat                      # Windows setup script
-│   └── start_demo.ps1                 # One-command demo launcher
+│   └── start_demo.ps1                 # One-command launcher
+├── docs/                              # Screenshots and assets
 ├── Dockerfile
 ├── setup_database.py
-├── SCOPE.md
 └── README.md
 ```
 
@@ -373,9 +380,9 @@ docker run -p 8000:8000 -e GEMINI_API_KEY=$KEY smart-health-new
 
 ---
 
-## 📝 License
+## License
 
-Hackathon Project — Smart Health 2024. Built for demonstration purposes.
+Personal/portfolio project — not intended for production deployment. Built to demonstrate full-stack ML engineering, honest fallback design, and real-time system architecture.
 
 ---
 
