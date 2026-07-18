@@ -92,13 +92,13 @@ The project explores what happens when you take statistical models (Prophet, Iso
 
 ## Tech Stack
 
-| Layer | Technology | Purpose |
-|---|---|---|
-| **Backend** | FastAPI, SQLAlchemy, Pydantic | Async REST API with auto-generated docs |
-| **ML/AI** | Prophet, scikit-learn, SciPy, Google Gemini | Forecasting, anomaly detection, optimization, reasoning |
-| **Frontend** | React 18, Vite 5, Tailwind CSS, Recharts | Glassmorphism UI with responsive charts |
-| **Database** | SQLite (local) / Neon PostgreSQL (production) | Time-series schema with 10 relational tables |
-| **DevOps** | Docker, Vercel-ready frontend | Containerized backend, static frontend deploy |
+|     Layer    |                 Technology                    |                        Purpose                          |
+|--------------|-----------------------------------------------|---------------------------------------------------------|
+| **Backend**  |        FastAPI, SQLAlchemy, Pydantic          |      Async REST API with auto-generated docs            |
+| **ML/AI**    | Prophet, scikit-learn, SciPy, Google Gemini   | Forecasting, anomaly detection, optimization, reasoning |
+| **Frontend** |   React 18, Vite 5, Tailwind CSS, Recharts    |      Glassmorphism UI with responsive charts            |
+| **Database** | SQLite (local) / Neon PostgreSQL (production) |     Time-series schema with 10 relational tables        |
+| **DevOps**   |       Docker, Vercel-ready frontend           |    Containerized backend, static frontend deploy        |
 
 ---
 
@@ -106,21 +106,21 @@ The project explores what happens when you take statistical models (Prophet, Iso
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Frontend (React + Vite)                │
-│  Dashboard · PHC Detail · Recommendations · Alerts · Sim │
+│                    Frontend (React + Vite)              │
+│  Dashboard · PHC Detail · Recommendations · Alerts · Sim│
 └──────────────────────────┬──────────────────────────────┘
                            │ REST API (JSON)
 ┌──────────────────────────▼──────────────────────────────┐
-│                  Backend (FastAPI)                        │
-│  ┌─────────┐  ┌──────────┐  ┌───────────┐  ┌─────────┐ │
-│  │ Routes  │  │ Schemas  │  │ ML Models │  │ Gemini  │ │
-│  │ (25+    │→ │ (Pydantic│→ │ (Prophet, │→ │ Service │ │
-│  │ endpoints)│  │  models) │  │  IsoForest)│  │ (AI)   │ │
-│  └─────────┘  └──────────┘  └───────────┘  └─────────┘ │
+│                  Backend (FastAPI)                      │
+│  ┌─────────┐  ┌──────────┐  ┌───────────┐  ┌─────────┐  │ 
+│  │ Routes  │  │ Schemas  │  │ ML Models │  │ Gemini  │  │
+│  │ (25+    │→ │ (Pydantic│→ │ (Prophet, │→ │ Service │  │
+│  │ endpoints)│  │  models) │  │  IsoForest)│  │ (AI) │  │
+│  └─────────┘  └──────────┘  └───────────┘  └─────────┘  │
 └──────────────────────────┬──────────────────────────────┘
                            │ SQLAlchemy ORM
 ┌──────────────────────────▼──────────────────────────────┐
-│              Database (SQLite / PostgreSQL)              │
+│              Database (SQLite / PostgreSQL)             │
 │  phcs · medicines · stocks · footfalls · beds ·         │
 │  doctor_attendances · test_availabilities ·             │
 │  predictions · anomalies · recommendations              │
