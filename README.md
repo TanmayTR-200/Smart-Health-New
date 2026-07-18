@@ -1,6 +1,4 @@
-<div align="center">
-
-# 🏥 Smart Health
+# Smart Health
 
 ### AI-Powered District Health Management System
 
@@ -13,28 +11,26 @@ A full-stack platform that brings real-time visibility and predictive intelligen
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38BDF8?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-Portfolio_Project-blue)](#license)
 
-</div>
-
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [Overview](#-overview)
-- [Engineering Highlights](#-engineering-highlights)
-- [Key Features](#-key-features)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
-- [ML Models](#-ml-models)
-- [Getting Started](#-getting-started)
-- [API Documentation](#-api-documentation)
-- [Project Structure](#-project-structure)
-- [Data Transparency](#-data-transparency)
-- [Deployment](#-deployment)
+- [Overview](#overview)
+- [Engineering Highlights](#engineering-highlights)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [ML Models](#ml-models)
+- [Getting Started](#getting-started)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Data Transparency](#data-transparency)
+- [Deployment](#deployment)
 - [License](#license)
 
 ---
 
-## 📖 Overview
+## Overview
 
 Smart Health is a full-stack platform that applies ML forecasting, anomaly detection, and linear programming optimization to a real-world problem: district-level health resource management in India. It monitors **6 PHCs/CHCs** across a sample district, tracking medicine stocks, patient footfall, bed availability, doctor attendance, and diagnostic test availability.
 
@@ -42,71 +38,71 @@ The project explores what happens when you take statistical models (Prophet, Iso
 
 ---
 
-## ⚡ Engineering Highlights
+## Engineering Highlights
 
-**Honest method transparency** — Every ML component (Prophet, IsolationForest, LP optimization) has a tested fallback and reports which method actually ran via a `method` field in the API response. The UI surfaces this as a badge on every page (Dashboard, PHC Detail, Recommendations, Alerts) so you always know whether you're looking at a Prophet prediction or a moving-average fallback.
+**Honest method transparency** — Every ML component (Prophet, IsolationForest, LP optimization) has a tested fallback and reports which method actually ran via a `method` field in the API response. The frontend surfaces this as a badge on every page (Dashboard, PHC Detail, Recommendations, Alerts) so the consumer always knows whether they're looking at a Prophet prediction or a moving-average fallback.
 
-**pytest suite covering decision boundaries** — Tests verify that fallback triggers fire correctly (<30 days of data → insufficient_data, deficit > excess → rule_based_fallback, <4 PHCs → average_threshold), that LP solutions respect supply/demand constraints, and that IsolationForest genuinely flags outlier PHCs. Not just happy-path tests.
+**pytest suite covering decision boundaries** — Tests verify that fallback triggers fire correctly (<30 days of data returns insufficient_data, deficit exceeds excess triggers rule_based_fallback, fewer than 4 PHCs falls back to average_threshold), that LP solutions respect supply/demand constraints, and that IsolationForest genuinely flags outlier PHCs. Not just happy-path tests.
 
-**Linear programming with real scipy.optimize.linprog** — The redistribution engine formulates a genuine LP: minimise unmet deficit + transfer distance across a 6×6 PHC cost matrix, with an equality constraint that makes the problem infeasible when total deficit exceeds total excess (triggering the rule-based fallback). Not a threshold-matching algorithm relabeled as "optimization."
+**Linear programming with real scipy.optimize.linprog** — The redistribution engine formulates a genuine LP: minimise unmet deficit plus transfer distance across a 6x6 PHC cost matrix, with an equality constraint that makes the problem infeasible when total deficit exceeds total excess (triggering the rule-based fallback). Not a threshold-matching algorithm relabeled as "optimization."
 
 **Multilingual with live AI translation** — UI text uses a dictionary, but all AI-generated content (recommendation reasoning, alert descriptions) is translated live via Google Gemini, with in-memory caching to minimise API calls.
 
 ---
 
-## 🎯 Key Features
+## Key Features
 
-### 📊 Dashboard
+### Dashboard
 - District-wide health overview with real-time metrics
-- **Health Score (0–100)** per PHC — color-coded with composite scoring:
-  - Stock reliability (35%) · Doctor attendance (25%) · Bed utilization (20%) · Test availability (20%)
+- **Health Score (0-100)** per PHC — color-coded with composite scoring:
+  - Stock reliability (35%) / Doctor attendance (25%) / Bed utilization (20%) / Test availability (20%)
 - Active alerts panel with severity indicators
 - Interactive charts (health score comparison, status distribution)
 
-### 🏥 PHC Detail View
+### PHC Detail View
 - 30-day footfall trends with emergency case highlighting
-- Bed occupancy & doctor attendance charts
+- Bed occupancy and doctor attendance charts
 - Medicine stock table with low-stock alerts and prediction method badges
 - Individual health score with trend indicators
 
-### 🤖 Redistribution Recommendations
+### Redistribution Recommendations
 - Linear programming engine computing optimal transfer routes between PHCs
-- Priority classification: **Critical → High → Medium**
+- Priority classification: Critical, High, Medium
 - **Google Gemini AI** generates contextual reasoning for each recommendation
 - Transfer quantity calculations with impact projections and route distances
 
-### 🚨 Alerts Center
+### Alerts Center
 - Real-time anomaly detection across 4 categories:
-  - Stock-out warnings · Underperforming PHCs · Attendance drops · Bed shortages
+  - Stock-out warnings, underperforming PHCs, attendance drops, bed shortages
 - Filterable by severity with timestamped details
 
-### 🎮 Simulation Mode
+### Simulation Mode
 - **Advance Day** — move the simulation forward to see predictions evolve
 - **Trigger Events**:
-  - 🦠 Disease outbreak (spikes footfall + medicine usage)
-  - 📦 Delayed resupply (causes stock-out risk)
-  - 👨‍⚕️ Doctor absence spike (sharp attendance drop)
+  - Disease outbreak (spikes footfall + medicine usage)
+  - Delayed resupply (causes stock-out risk)
+  - Doctor absence spike (sharp attendance drop)
 - Live system reactions visible across all dashboard pages
 
-### 🌐 Multilingual Support
-- English · Hindi (हिं) · Kannada (ಕನ್ನಡ)
+### Multilingual Support
+- English, Hindi, Kannada
 - UI translation via dictionary + **Gemini-powered dynamic translation** for AI-generated content
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| **Backend** | FastAPI · SQLAlchemy · Pydantic | Async REST API with auto-generated docs |
-| **ML/AI** | Prophet · scikit-learn · SciPy · Google Gemini | Forecasting, anomaly detection, optimization, reasoning |
-| **Frontend** | React 18 · Vite 5 · Tailwind CSS · Recharts | Glassmorphism UI with responsive charts |
+| **Backend** | FastAPI, SQLAlchemy, Pydantic | Async REST API with auto-generated docs |
+| **ML/AI** | Prophet, scikit-learn, SciPy, Google Gemini | Forecasting, anomaly detection, optimization, reasoning |
+| **Frontend** | React 18, Vite 5, Tailwind CSS, Recharts | Glassmorphism UI with responsive charts |
 | **Database** | SQLite (local) / Neon PostgreSQL (production) | Time-series schema with 10 relational tables |
-| **DevOps** | Docker · Vercel-ready frontend | Containerized backend, static frontend deploy |
+| **DevOps** | Docker, Vercel-ready frontend | Containerized backend, static frontend deploy |
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -133,24 +129,24 @@ The project explores what happens when you take statistical models (Prophet, Iso
 
 ---
 
-## 🧠 ML Models
+## ML Models
 
 | Model | Type | What It Does |
 |---|---|---|
 | **Stock-out Prediction** | Prophet time-series (local) / 7-day moving average (deployed) | Forecasts days until stockout per medicine per PHC. Prophet runs locally with confidence 0.8; Render free tier OOMs on Prophet, so production uses the moving average fallback (confidence 0.6). `method` field in API response reports which one ran. |
-| **Demand Forecasting** | Prophet time-series (local) / seasonal trend (fallback) | Fits Prophet on PHC footfall history to forecast the next 7 days with real confidence intervals from `yhat_lower`/`yhat_upper`. Falls back to trend + fixed seasonal multipliers (monsoon 1.3×, winter 1.15×) when Prophet is unavailable or <14 days of data. `method: "prophet"` or `"seasonal_trend"`. |
+| **Demand Forecasting** | Prophet time-series (local) / seasonal trend (fallback) | Fits Prophet on PHC footfall history to forecast the next 7 days with real confidence intervals from `yhat_lower`/`yhat_upper`. Falls back to trend + fixed seasonal multipliers (monsoon 1.3x, winter 1.15x) when Prophet is unavailable or <14 days of data. `method: "prophet"` or `"seasonal_trend"`. |
 | **Anomaly Detection** | IsolationForest with average-threshold fallback | Fits IsolationForest on the 4-component health feature vector (stock, attendance, beds, tests) per PHC. `decision_function()` produces a real anomaly score; `fit_predict()` flags statistical outliers. Severity combines both the model signal and the district-average gap — outliers below average escalate, non-outliers de-escalate. Falls back to average-threshold when <4 PHCs. `method: "isolation_forest"` or `"average_threshold"`. |
-| **Redistribution Engine** | Linear programming (scipy.optimize.linprog) with rule-based fallback | Minimises unmet deficit + transfer distance across a 6×6 PHC distance matrix. Falls back to greedy threshold matching when total deficit exceeds total excess (LP infeasible). `method` field reports `"linear_programming"` or `"rule_based_fallback"`. |
+| **Redistribution Engine** | Linear programming (scipy.optimize.linprog) with rule-based fallback | Minimises unmet deficit + transfer distance across a 6x6 PHC distance matrix. Falls back to greedy threshold matching when total deficit exceeds total excess (LP infeasible). `method` field reports `"linear_programming"` or `"rule_based_fallback"`. |
 | **Gemini AI Service** | Google Gemini API | Generates natural-language reasoning for recommendations and real-time multilingual translation. Degrades to template text if API key is missing. |
 
-> Every prediction endpoint reports its `method` field in the JSON response, and the frontend surfaces it as a badge so you can verify which algorithm actually produced the result.
+> Every prediction endpoint reports its `method` field in the JSON response, and the frontend surfaces it as a badge so the consumer can verify which algorithm actually produced the result.
 >
 > **Compute**: Render free tier web service (spins down after 15 min inactivity — first request may take 30-60s).
 > **Database**: Neon serverless PostgreSQL (free tier, scales to zero — first query after idle may take a few seconds). SQLite for local development.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -251,7 +247,7 @@ DATABASE_URL=sqlite:///smart_health_new.db       # Or postgresql://user:pass@hos
 
 ---
 
-## 📡 API Documentation
+## API Documentation
 
 FastAPI auto-generates interactive docs at `/docs` (Swagger UI) and `/redoc`.
 
@@ -281,7 +277,7 @@ FastAPI auto-generates interactive docs at `/docs` (Swagger UI) and `/redoc`.
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Smart-Health-New/
@@ -340,24 +336,24 @@ Smart-Health-New/
 
 ---
 
-## 📊 Data Transparency
+## Data Transparency
 
 All data is **synthetic** but calibrated to real-world parameters:
 
 | Parameter | Source | Value |
 |---|---|---|
 | Medicine list | National List of Essential Medicines (NLEM) 2023 | 6 essential medicines |
-| Doctor absenteeism | Rural Health Statistics (RHS) 2021–22 | 15–20% (10% higher on Mondays) |
-| Bed norms | Indian Public Health Standards (IPHS) | PHC: 6–10 beds · CHC: 30 beds |
-| Footfall patterns | IDSP (Integrated Disease Surveillance Programme) | 20–150/day with seasonal multipliers |
-| Test availability | NHM Comprehensive Primary Health Care guidelines | 85–95% equipment uptime |
-| Seasonal disease | IDSP data | Monsoon: 1.3× (malaria/dengue) · Winter: 1.15× (respiratory) |
+| Doctor absenteeism | Rural Health Statistics (RHS) 2021-22 | 15-20% (10% higher on Mondays) |
+| Bed norms | Indian Public Health Standards (IPHS) | PHC: 6-10 beds, CHC: 30 beds |
+| Footfall patterns | IDSP (Integrated Disease Surveillance Programme) | 20-150/day with seasonal multipliers |
+| Test availability | NHM Comprehensive Primary Health Care guidelines | 85-95% equipment uptime |
+| Seasonal disease | IDSP data | Monsoon: 1.3x (malaria/dengue), Winter: 1.15x (respiratory) |
 
 **Data volume**: ~35,000+ records across 10 tables covering 12 months of daily data for 6 PHCs.
 
 ---
 
-## 🚢 Deployment
+## Deployment
 
 ### Frontend (Vercel)
 ```bash
@@ -383,11 +379,3 @@ docker run -p 8000:8000 -e GEMINI_API_KEY=$KEY smart-health-new
 ## License
 
 Personal/portfolio project — not intended for production deployment. Built to demonstrate full-stack ML engineering, honest fallback design, and real-time system architecture.
-
----
-
-<div align="center">
-
-**Built with ❤️ for India's Primary Health Centres**
-
-</div>
