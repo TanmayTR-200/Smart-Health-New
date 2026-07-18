@@ -274,17 +274,19 @@ class StockoutPredictionResponse(BaseModel):
     current_stock: int
     days_until_stockout: float
     confidence: float
+    method: str
     recommended_action: str
 
 
 class DemandForecastResponse(BaseModel):
     phc_id: int
     phc_name: str
-    forecast_date: date_type
+    forecast_date: Optional[date_type] = None
     predicted_footfall: int
     confidence_lower: int
     confidence_upper: int
     trend: str
+    method: str
 
 
 class RedistributionSuggestion(BaseModel):
@@ -298,6 +300,7 @@ class RedistributionSuggestion(BaseModel):
     urgency: str
     reason: str
     impact: str
+    method: str
 
 
 # Simulation Schemas

@@ -105,34 +105,36 @@ A full-stack AI-powered district health management system for monitoring and opt
 
 ## ML Models Implemented
 
-### 1. Stock-out Prediction (Prophet)
+### 1. Stock-out Prediction (Prophet / Moving Average)
 - **Type**: Time-series forecasting
 - **Input**: 12 months daily stock per PHC-medicine
 - **Output**: Days until stockout with confidence
 - **Features**: Seasonality, trends, weekly patterns
-- **Fallback**: Moving average if Prophet unavailable
+- **Local**: Prophet (confidence 0.8)
+- **Deployed (Render free tier)**: 7-day moving average fallback (confidence 0.6) — Prophet OOMs on Render's 512MB free tier
+- **API `method` field**: `"prophet"` or `"moving_average"`
 
-### 2. Demand Forecasting
-- **Type**: Trend-based with seasonal adjustment
+### 2. Demand Forecasting (Seasonal Trend)
+- **Type**: Trend + fixed seasonal multipliers (not a learned model)
 - **Input**: Historical footfall data
 - **Output**: 7-day patient volume forecast
-- **Features**: Trend detection, monsoon/winter adjustments
+- **Features**: Trend detection, monsoon 1.3×, winter 1.15×, weekends 0.7×
+- **API `method` field**: `"seasonal_trend"`
 
-### 3. Anomaly Detection (Isolation Forest)
-- **Type**: Unsupervised outlier detection
+### 3. Anomaly Detection (Average-Threshold)
+- **Type**: District average comparison
 - **Input**: Composite health scores (stock 35%, attendance 25%, beds 20%, tests 20%)
 - **Output**: Underperforming PHCs with severity
-- **Features**: Multi-dimensional analysis, statistical outliers
+- **Details**: IsolationForest is imported and initialised but the deployed path flags PHCs whose health score falls below the district average
+- **API `method` field**: `"average_threshold"`
 
-### 4. Redistribution Engine
-- **Type**: Rule-based optimization + Gemini AI reasoning
-- **Input**: Current stocks, predictions, thresholds
+### 4. Redistribution Engine (Linear Programming)
+- **Type**: scipy.optimize.linprog with rule-based fallback
+- **Input**: Current stocks, predictions, 6×6 PHC distance matrix
 - **Output**: Optimal transfer recommendations with AI-generated explanations
-- **Logic**: 
-  - Excess: stock > 3x threshold
-  - Deficit: stock < 1.5x OR predicted stockout < 7 days
-  - Priority: critical → high → medium
-  - Gemini generates contextual reasoning based on actual stock numbers, PHC names, and urgency
+- **LP objective**: Minimise unmet deficit + transfer distance
+- **Fallback**: Greedy threshold matching when LP is infeasible (total deficit > total excess)
+- **API `method` field**: `"linear_programming"` or `"rule_based_fallback"`
 
 ### 5. Gemini AI Service (NEW)
 - **Dynamic Reasoning**: Generates human-like explanations for redistribution recommendations
@@ -402,10 +404,10 @@ npm run dev
 - Stock monitoring, footfall tracking, bed availability, attendance, test availability
 
 **AI/ML (Hard)**:
-- Stock-out prediction (Prophet time-series)
-- Demand forecasting (trend + seasonal)
-- Anomaly detection (Isolation Forest)
-- Resource redistribution (optimization engine)
+- Stock-out prediction (Prophet locally, moving average in production — `method` field in API response)
+- Demand forecasting (seasonal trend — not a learned model, clearly labelled)
+- Anomaly detection (average-threshold comparison — IsolationForest imported but not in the deployed path)
+- Resource redistribution (linear programming via scipy.optimize.linprog, with rule-based fallback)
 - Gemini-powered reasoning and translation
 
 ### 2. Why This Matters
@@ -417,9 +419,9 @@ npm run dev
 
 ### 3. Technical Depth
 - 4 distinct ML models (not just threshold alerts)
-- Time-series forecasting with confidence intervals
-- Statistical anomaly detection
-- Multi-constraint optimization
+- Time-series forecasting with confidence intervals (Prophet local / moving average deployed)
+- Average-threshold anomaly detection
+- Linear programming optimization with distance cost matrix and rule-based fallback
 - Live simulation mode for demo
 - Multilingual support for accessibility
 - Gemini AI integration for dynamic content generation

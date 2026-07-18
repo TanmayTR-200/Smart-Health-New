@@ -648,6 +648,7 @@ async def get_stockout_predictions(phc_id: Optional[int] = None, db: Session = D
                     current_stock=int(current_stock),
                     days_until_stockout=pred['days_until_stockout'],
                     confidence=pred['confidence'],
+                    method=pred.get('method', 'unknown'),
                     recommended_action=pred['recommended_action']
                 ))
     
@@ -689,6 +690,10 @@ async def get_anomalies(db: Session = Depends(get_db)):
     
     # Detect anomalies
     anomalies = ml_manager.anomaly_detector.detect_anomalies(phc_scores)
+    
+    # Tag each anomaly with the detection method used
+    for anomaly in anomalies:
+        anomaly["method"] = "average_threshold"
     
     return anomalies
 
@@ -759,7 +764,8 @@ async def get_redistribution_recommendations(db: Session = Depends(get_db)):
             quantity=rec['quantity'],
             urgency=rec['urgency'],
             reason=rec['reason'],
-            impact=rec['impact']
+            impact=rec['impact'],
+            method=rec.get('method', 'unknown')
         ))
     
     return result

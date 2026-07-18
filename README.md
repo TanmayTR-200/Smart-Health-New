@@ -132,13 +132,16 @@ Smart Health is a full-stack AI-powered platform designed to bring real-time vis
 
 | Model | Type | What It Does |
 |---|---|---|
-| **Stock-out Prediction** | Prophet time-series | Forecasts days until stockout per medicine per PHC using 12 months of historical data with seasonality & trend detection |
-| **Demand Forecasting** | Trend + seasonal adjustment | Predicts 7-day patient footfall using historical patterns (monsoon/winter multipliers, weekly cycles) |
-| **Anomaly Detection** | Isolation Forest (unsupervised) | Flags underperforming PHCs by detecting statistical outliers across composite health scores |
-| **Redistribution Engine** | Rule-based optimization + Gemini AI | Computes optimal resource transfers between PHCs; Gemini generates human-readable reasoning and impact analysis |
-| **Gemini AI Service** | Google Gemini API | Provides dynamic natural-language reasoning for recommendations and real-time multilingual translation |
+| **Stock-out Prediction** | Prophet time-series (local) / 7-day moving average (deployed) | Forecasts days until stockout per medicine per PHC. Prophet runs locally with confidence 0.8; Render free tier OOMs on Prophet, so production uses the moving average fallback (confidence 0.6). `method` field in API response reports which one ran. |
+| **Demand Forecasting** | Seasonal trend forecasting | Predicts 7-day patient footfall using recent trend detection + fixed seasonal multipliers (monsoon 1.3×, winter 1.15×, weekends 0.7×). Not a learned model — `method: "seasonal_trend"`. |
+| **Anomaly Detection** | Average-threshold comparison | Flags PHCs whose composite health score (stock 35%, attendance 25%, beds 20%, tests 20%) falls below the district average. IsolationForest is imported and initialised but the deployed path uses the average-threshold method. `method: "average_threshold"`. |
+| **Redistribution Engine** | Linear programming (scipy.optimize.linprog) with rule-based fallback | Minimises unmet deficit + transfer distance across a 6×6 PHC distance matrix. Falls back to greedy threshold matching when total deficit exceeds total excess (LP infeasible). `method` field reports `"linear_programming"` or `"rule_based_fallback"`. |
+| **Gemini AI Service** | Google Gemini API | Generates natural-language reasoning for recommendations and real-time multilingual translation. Degrades to template text if API key is missing. |
 
-> All ML models gracefully degrade to fallback strategies (e.g., moving average) if dependencies are unavailable.
+> Every prediction endpoint reports its `method` field in the JSON response so judges can verify which algorithm actually produced the result.
+>
+> **Compute**: Render free tier web service (spins down after 15 min inactivity — first request may take 30-60s).
+> **Database**: Neon serverless PostgreSQL (free tier, scales to zero — first query after idle may take a few seconds). SQLite for local development.
 
 ---
 
