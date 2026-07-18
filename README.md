@@ -2,7 +2,7 @@
 
 ### AI-Powered District Health Management System
 
-A full-stack platform that brings real-time visibility and predictive intelligence to district-level health resource management in India. It monitors 6 Primary Health Centres, tracking medicine stocks, patient footfall, bed availability, doctor attendance, and diagnostic test availability — powered by ML forecasting, anomaly detection, linear programming optimization, and Google Gemini AI for natural-language reasoning.
+**Live:** https://smart-health-new.vercel.app
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
