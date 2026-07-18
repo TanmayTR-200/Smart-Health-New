@@ -378,4 +378,4 @@ docker run -p 8000:8000 -e GEMINI_API_KEY=$KEY smart-health-new
 
 ## License
 
-Personal/portfolio project — not intended for production deployment. Built to demonstrate full-stack ML engineering, honest fallback design, and real-time system architecture.
+Personal/portfolio project with a live demo deployment for showcase purposes — not built or maintained as a production service. Demonstrates full-stack ML engineering, honest fallback design, and real-time system architecture.
