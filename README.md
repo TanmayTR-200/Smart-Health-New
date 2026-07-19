@@ -354,6 +354,31 @@ All data is **synthetic** but calibrated to real-world parameters:
 
 ---
 
+## Model Performance
+
+A backtest script (`backend/scripts/backtest.py`) holds out the last 30 days of synthetic data and compares Prophet vs the 7-day moving average fallback across all 36 PHC-medicine pairs. This is a local-only step (Prophet is not installed on Render's free tier).
+
+**Headline results:**
+
+| Metric | Prophet | Moving Average | Winner |
+|---|---|---|---|
+| Average MAE | 362.88 | 264.94 | Moving Average |
+| Average RMSE | 410.85 | 298.15 | Moving Average |
+| Prophet win rate (MAE) | 33.3% | - | - |
+| Prophet win rate (RMSE) | 27.8% | - | - |
+
+The moving average outperforms Prophet on average with this synthetic dataset. Prophet wins on 12/36 pairs (33%) — typically where there are strong seasonal patterns. This is an honest result that justifies the fallback design: the moving average is not a compromise, it's competitive.
+
+Full per-pair results: [docs/backtest_results.md](docs/backtest_results.md)
+
+Run locally:
+```bash
+cd backend
+python scripts/backtest.py
+```
+
+---
+
 ## Deployment
 
 ### Frontend (Vercel)
