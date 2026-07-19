@@ -238,11 +238,6 @@ function Dashboard() {
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 font-semibold uppercase">
                       {alert.severity}
                     </span>
-                    {alert.method && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-violet-50 text-violet-600 font-medium">
-                        {alert.method.replace(/_/g, ' ')}
-                      </span>
-                    )}
                   </div>
                 </div>
               ))
