@@ -24,3 +24,21 @@ jobs:
       - name: Run pytest
         working-directory: backend
         run: pytest -v
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Run Vitest
+        working-directory: frontend
+        run: npm test
