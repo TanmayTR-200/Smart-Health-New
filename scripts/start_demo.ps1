@@ -21,8 +21,8 @@ Start-Sleep -Seconds 2
 Write-Host "[2/5] Setting up database..." -ForegroundColor Yellow
 
 # Delete old database if exists
-if (Test-Path "smart_health.db") {
-    Remove-Item "smart_health.db" -Force
+if (Test-Path "smart_health_new.db") {
+    Remove-Item "smart_health_new.db" -Force
     Write-Host "  ✓ Old database removed" -ForegroundColor Green
 }
 

@@ -5,7 +5,7 @@ echo ========================================
 echo.
 
 REM Check if database exists
-if exist "%~dp0..\smart_health.db" (
+if exist "%~dp0..\smart_health_new.db" (
     echo Database already exists. Skipping setup.
     goto :start_servers
 )
@@ -37,7 +37,7 @@ REM Verify
 echo.
 echo [3/3] Verifying database...
 cd /d "%~dp0.."
-python -c "import sqlite3; conn = sqlite3.connect('smart_health.db'); cursor = conn.cursor(); cursor.execute('SELECT COUNT(*) FROM phcs'); count = cursor.fetchone()[0]; print(f'SUCCESS: Database created with {count} PHCs'); conn.close()"
+python -c "import sqlite3; conn = sqlite3.connect('smart_health_new.db'); cursor = conn.cursor(); cursor.execute('SELECT COUNT(*) FROM phcs'); count = cursor.fetchone()[0]; print(f'SUCCESS: Database created with {count} PHCs'); conn.close()"
 if errorlevel 1 (
     echo ERROR: Database verification failed
     pause

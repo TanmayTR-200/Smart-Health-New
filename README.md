@@ -47,7 +47,7 @@ This project was originally built as a hackathon entry and has since been extend
 
 ## Engineering Highlights
 
-**Honest method transparency** — Every ML component (Prophet, IsolationForest, LP optimization) has a tested fallback and reports which method actually ran via a `method` field in the API response. The frontend surfaces this as a badge on every page (Dashboard, PHC Detail, Recommendations, Alerts) so the consumer always knows whether they're looking at a Prophet prediction or a moving-average fallback.
+**Honest method transparency** — Every ML component (Prophet, IsolationForest, LP optimization) has a tested fallback and reports which method actually ran via a `method` field in the API response. The frontend surfaces this as a badge on PHC Detail, Recommendations, and Alerts so the consumer always knows whether they're looking at a Prophet prediction or a moving-average fallback.
 
 **pytest suite covering decision boundaries** — Tests verify that fallback triggers fire correctly (<30 days of data returns insufficient_data, deficit exceeds excess triggers rule_based_fallback, fewer than 4 PHCs falls back to average_threshold), that LP solutions respect supply/demand constraints, and that IsolationForest genuinely flags outlier PHCs. Not just happy-path tests.
 
