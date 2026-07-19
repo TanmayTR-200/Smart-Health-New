@@ -36,7 +36,7 @@ def _init_gemini() -> bool:
 
     try:
         genai.configure(api_key=api_key)
-        _gemini_model = genai.GenerativeModel("gemini-2.0-flash")
+        _gemini_model = genai.GenerativeModel("gemini-2.5-flash")
         _gemini_available = True
         print("[GEMINI] Initialized successfully.")
         return True
