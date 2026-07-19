@@ -4,6 +4,8 @@
 
 **Live:** https://smart-health-new.vercel.app
 
+**Demo login:** `admin` / `smarthealth123`
+
 [![CI](https://github.com/TanmayTR-200/Smart-Health-New/actions/workflows/ci.yml/badge.svg)](https://github.com/TanmayTR-200/Smart-Health-New/actions/workflows/ci.yml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
@@ -36,6 +38,12 @@
 Smart Health is a full-stack platform that applies ML forecasting, anomaly detection, and linear programming optimization to a real-world problem: district-level health resource management in India. It monitors **6 PHCs/CHCs** across a sample district, tracking medicine stocks, patient footfall, bed availability, doctor attendance, and diagnostic test availability.
 
 The project explores what happens when you take statistical models (Prophet, IsolationForest, LP) and apply them honestly to an operational domain — including graceful fallbacks when compute constraints prevent the primary model from running, and transparent method reporting so consumers always know which algorithm produced the result they're looking at.
+
+---
+
+## Portfolio Notes
+
+This project was originally built as a hackathon entry and has since been extended with CI (GitHub Actions: pytest, Vitest, mypy), a backtest script comparing Prophet vs moving-average accuracy, and JWT-based auth. The ML fallback design — where every model reports which method actually ran — was a deliberate engineering choice to ensure transparency rather than a workaround for free-tier constraints.
 
 ---
 

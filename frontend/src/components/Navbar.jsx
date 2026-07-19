@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Activity, AlertTriangle, GitMerge, Home, Globe, HeartPulse } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Activity, AlertTriangle, GitMerge, Home, Globe, HeartPulse, LogOut } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { language, setLanguage, t } = useLanguage();
+  const { logout } = useAuth();
 
   const navItems = [
     { path: '/', label: t('dashboard'), icon: Home },
@@ -70,6 +73,15 @@ function Navbar() {
               <span className="font-semibold">
                 {language === 'en' ? 'EN' : language === 'hi' ? 'हिं' : 'ಕನ'}
               </span>
+            </button>
+
+            {/* Logout */}
+            <button
+              onClick={() => { logout(); navigate('/login'); }}
+              className="flex items-center px-3 py-2 rounded-xl text-sm font-medium bg-white/60 border border-slate-200 hover:border-rose-300 hover:bg-rose-50 text-slate-700 transition-all duration-200 ml-2"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4 text-rose-500" />
             </button>
           </div>
         </div>

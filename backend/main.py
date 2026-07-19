@@ -1,12 +1,14 @@
 """
 Smart Health - FastAPI Backend Main Application
 """
-from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi import FastAPI, Depends, HTTPException, Query, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from datetime import datetime, date, timedelta
 from typing import Optional, List, Dict
 import os
+import jwt
 import random
 import numpy as np
 
@@ -18,11 +20,38 @@ from app.schemas.models import (
     DistrictSummary, AlertItem, PHCHealthScore,
     StockoutPredictionResponse, DemandForecastResponse,
     RedistributionSuggestion, MessageResponse,
-    SimulationAdvanceRequest, SimulationEventRequest, SimulationResponse
+    SimulationAdvanceRequest, SimulationEventRequest, SimulationResponse,
+    LoginRequest, TokenResponse
 )
 from app.models.ml_models import MLModelManager
 from app.services.gemini_service import generate_text
 import pandas as pd
+
+# --- Auth configuration (demo only) ----------------------------------
+JWT_SECRET = os.getenv("JWT_SECRET", "smart-health-demo-secret-change-me")
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRE_HOURS = 24
+DEMO_ADMIN_USERNAME = "admin"
+DEMO_ADMIN_PASSWORD = "smarthealth123"
+
+security = HTTPBearer(auto_error=False)
+
+
+def create_access_token(data: dict) -> str:
+    payload = data.copy()
+    payload["exp"] = datetime.utcnow() + timedelta(hours=JWT_EXPIRE_HOURS)
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Security(security)) -> dict:
+    """Verify JWT token. Returns decoded payload or raises 401."""
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -178,6 +207,23 @@ async def startup_event():
 async def root():
     """Health check endpoint"""
     return {"message": "Smart Health API is running", "success": True}
+
+
+# ==================== Auth Endpoints ====================
+
+@app.post("/api/auth/login", response_model=TokenResponse)
+async def login(request: LoginRequest):
+    """Login with demo credentials. Returns a JWT token."""
+    if request.username != DEMO_ADMIN_USERNAME or request.password != DEMO_ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    token = create_access_token({"sub": request.username, "role": "admin"})
+    return {"access_token": token, "token_type": "bearer"}
+
+
+@app.get("/api/auth/verify")
+async def verify(payload: dict = Depends(verify_token)):
+    """Verify that the current token is valid."""
+    return {"valid": True, "user": payload.get("sub")}
 
 
 # ==================== PHC Endpoints ====================
