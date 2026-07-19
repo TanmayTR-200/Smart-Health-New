@@ -74,12 +74,6 @@ function Navbar() {
           </div>
         </div>
       </div>
-      {/* Cold start notice — visible immediately on page load */}
-      <div className="bg-amber-50/80 border-t border-amber-200/60 px-4 py-1.5 text-center">
-        <p className="text-[11px] text-amber-700 font-medium">
-          ⏳ First load may take 30-60 seconds — the server is waking up from inactivity.
-        </p>
-      </div>
     </nav>
   );
 }
