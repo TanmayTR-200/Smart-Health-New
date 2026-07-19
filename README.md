@@ -4,6 +4,7 @@
 
 **Live:** https://smart-health-new.vercel.app
 
+[![CI](https://github.com/TanmayTR-200/Smart-Health-New/actions/workflows/ci.yml/badge.svg)](https://github.com/TanmayTR-200/Smart-Health-New/actions/workflows/ci.yml)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
