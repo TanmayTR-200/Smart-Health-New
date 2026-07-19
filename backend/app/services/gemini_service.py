@@ -72,11 +72,13 @@ def generate_text(
 
     for attempt in range(1, max_retries + 1):
         try:
+            if _gemini_model is None:
+                return fallback
             future = _executor.submit(_gemini_model.generate_content, prompt)
             response = future.result(timeout=timeout_seconds)
 
             if response and response.text:
-                return response.text.strip()
+                return str(response.text.strip())
             return fallback
 
         except FutureTimeoutError:

@@ -110,7 +110,7 @@ class StockoutPredictor:
         # Check prediction cache — refit only when latest_date changes
         cache_key = (phc_id, medicine_id, str(latest_date))
         if cache_key in self._prediction_cache:
-            return self._prediction_cache[cache_key]
+            return dict(self._prediction_cache[cache_key])
         
         # Use Prophet for forecasting
         if PROPHET_AVAILABLE:
@@ -618,11 +618,12 @@ class RedistributionEngine:
         current_key = _rec_key(recommendations)
         prev_key = _rec_key(prev_recommendations) if prev_recommendations else None
 
-        if prev_key and current_key == prev_key:
+        if prev_key and current_key == prev_key and prev_recommendations:
             for i, rec in enumerate(recommendations):
-                if i < len(prev_recommendations) and prev_recommendations[i].get('_gemini_reason'):
-                    rec['reason'] = prev_recommendations[i]['_gemini_reason']
-                    rec['_gemini_reason'] = prev_recommendations[i]['_gemini_reason']
+                prev_rec = prev_recommendations[i] if i < len(prev_recommendations) else None
+                if prev_rec and prev_rec.get('_gemini_reason'):
+                    rec['reason'] = prev_rec['_gemini_reason']
+                    rec['_gemini_reason'] = prev_rec['_gemini_reason']
             print("[GEMINI] Recommendations unchanged — reusing cached reasons")
         elif recommendations:
             try:
@@ -921,8 +922,8 @@ class RedistributionEngine:
                             priority = "high"
                         else:
                             priority = "medium"
-                        from_phc = next((p for p in phcs if p['id'] == excess['phc_id']), {})
-                        to_phc = next((p for p in phcs if p['id'] == deficit['phc_id']), {})
+                        from_phc: Dict = next((p for p in phcs if p['id'] == excess['phc_id']), {})
+                        to_phc: Dict = next((p for p in phcs if p['id'] == deficit['phc_id']), {})
                         surplus = excess['excess']
                         reason_parts = [
                             f"{to_phc.get('name', 'Destination')} has {deficit['stock']} units remaining",

@@ -21,6 +21,10 @@ jobs:
         run: |
           pip install -r backend/requirements.txt
 
+      - name: Run mypy
+        working-directory: backend
+        run: mypy app/ --config-file mypy.ini --explicit-package-bases
+
       - name: Run pytest
         working-directory: backend
         run: pytest -v
