@@ -151,18 +151,29 @@ The project explores what happens when you take statistical models (Prophet, Iso
 
 ### Prerequisites
 
-- **Python** 3.9+
-- **Node.js** 18+
-- **PostgreSQL** 14+ (optional — SQLite works out of the box)
+- **Docker** and **Docker Compose** (recommended path)
+- Or for manual setup: **Python** 3.9+, **Node.js** 18+
 
-### Option 1: Quick Start (Windows)
+### Option 1: Docker Compose (recommended)
 
-```powershell
+```bash
+git clone https://github.com/TanmayTR-200/Smart-Health-New.git
 cd Smart-Health-New
-.\scripts\start_demo.ps1
+docker-compose up
 ```
 
-This single command sets up the database, starts both servers, and opens the browser.
+This spins up three containers — PostgreSQL, backend (with auto-seeded data), and frontend — in one command. First run builds images and seeds the database; subsequent runs are instant.
+
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8001 |
+| API Docs (Swagger) | http://localhost:8001/docs |
+
+To pass a Gemini API key (optional):
+```bash
+GEMINI_API_KEY=your_key docker-compose up
+```
 
 ### Option 2: Manual Setup
 
@@ -205,8 +216,6 @@ cd frontend
 npm run dev
 ```
 
-**6. Access the application**
-
 | Service | URL |
 |---|---|
 | Frontend | http://localhost:5173 |
@@ -216,14 +225,11 @@ npm run dev
 ### Tests
 
 ```bash
+# Backend
 cd backend && pytest
-```
 
-### Option 3: Docker
-
-```bash
-docker build -t smart-health-new .
-docker run -p 8000:8000 -e GEMINI_API_KEY=your_key smart-health-new
+# Backtest (local only, requires Prophet installed)
+cd backend && python scripts/backtest.py
 ```
 
 ### Environment Variables
