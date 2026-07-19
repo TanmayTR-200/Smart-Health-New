@@ -8,7 +8,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, Area, AreaChart
 } from 'recharts';
-import { getPHC, getStock, getFootfall, getBedOccupancy, getAttendance, getStockoutPredictions, getDemandForecasts } from '../services/api';
+import { getPHC, getStock, getFootfall, getBedOccupancy, getAttendance } from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const CHART_COLORS = {
@@ -28,8 +28,6 @@ function PHCDetail() {
   const [footfall, setFootfall] = useState([]);
   const [beds, setBeds] = useState([]);
   const [attendance, setAttendance] = useState([]);
-  const [stockoutMethods, setStockoutMethods] = useState({});
-  const [demandMethod, setDemandMethod] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,24 +42,12 @@ function PHCDetail() {
         getFootfall({ phc_id: id, days: 15 }),
         getBedOccupancy({ phc_id: id, days: 15 }),
         getAttendance({ phc_id: id, days: 15 }),
-        getStockoutPredictions({ phc_id: id }).catch(() => ({ data: [] })),
-        getDemandForecasts({ phc_id: id }).catch(() => ({ data: [] })),
       ]);
       setPhc(phcRes.data);
       setStock(stockRes.data);
       setFootfall(footfallRes.data);
       setBeds(bedsRes.data);
       setAttendance(attendanceRes.data);
-
-      // Build medicine_id -> method map from stockout predictions
-      const methodMap = {};
-      stockoutRes.data.forEach(p => { methodMap[p.medicine_id] = p.method; });
-      setStockoutMethods(methodMap);
-
-      // Extract demand forecast method (first result for this PHC)
-      if (demandRes.data.length > 0) {
-        setDemandMethod(demandRes.data[0].method || '');
-      }
     } catch (error) {
       console.error('Error loading PHC data:', error);
     } finally {
@@ -281,11 +267,6 @@ function PHCDetail() {
         <div className="glass-card rounded-2xl p-6">
           <div className="flex items-center gap-3 mb-5">
             <h2 className="text-lg font-bold text-slate-800">{t('patientFootfall')}</h2>
-            {demandMethod && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-50 text-violet-600 border border-violet-100">
-                {demandMethod.replace(/_/g, ' ')}
-              </span>
-            )}
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={footfallChartData}>
@@ -417,7 +398,6 @@ function PHCDetail() {
                 <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">{t('currentStock')}</th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">{t('minRequired')}</th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">{t('status')}</th>
-                <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Method</th>
                 <th className="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">{t('lastRestocked')}</th>
               </tr>
             </thead>
@@ -449,13 +429,6 @@ function PHCDetail() {
                     ) : (
                       <span className="px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700">
                         {t('ok')}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {stockoutMethods[item.medicine_id] && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-50 text-violet-600 border border-violet-100">
-                        {stockoutMethods[item.medicine_id].replace(/_/g, ' ')}
                       </span>
                     )}
                   </td>
