@@ -18,8 +18,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: |
-          pip install -r backend/requirements.txt
+        run: pip install -r backend/requirements.txt
 
       - name: Run pytest
         working-directory: backend
@@ -42,7 +41,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        run: npm ci 2>/dev/null || npm install
+        run: npm ci || npm install
 
       - name: Run Vitest
         working-directory: frontend
